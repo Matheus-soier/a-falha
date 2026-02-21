@@ -1,6 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TerminalSquare, ChevronRight } from 'lucide-react';
+
+const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
+    const [displayText, setDisplayText] = useState('');
+    const letters = '01#@$%&<>*{}[]|\\/?~XYZ';
+
+    useEffect(() => {
+        let iteration = 0;
+        let interval: any = null;
+
+        // Slight delay before scramble starts for dramatic effect
+        setTimeout(() => {
+            interval = setInterval(() => {
+                setDisplayText(
+                    text.split('')
+                        .map((char, index) => {
+                            if (index < iteration) return char;
+                            if (char === ' ') return ' ';
+                            return letters[Math.floor(Math.random() * letters.length)];
+                        })
+                        .join('')
+                );
+
+                if (iteration >= text.length) {
+                    clearInterval(interval);
+                    setDisplayText(text);
+                }
+
+                iteration += 1 / 3;
+            }, 30);
+        }, 800);
+
+        return () => clearInterval(interval);
+    }, [text]);
+
+    return <>{displayText || ' '.repeat(text.length)}</>;
+};
 
 const HeroSection: React.FC = () => {
     const scrollToPricing = () => {
@@ -38,7 +74,7 @@ const HeroSection: React.FC = () => {
                 >
                     O mundo que você conhecia mudou{' '}
                     <span className="block mt-4 text-brand-neon">
-                        e você ainda não percebeu.
+                        <ScrambleText text="e você ainda não percebeu." />
                     </span>
                 </motion.h1>
 

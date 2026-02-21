@@ -101,7 +101,7 @@ const StacksWaveSection: React.FC = () => {
     };
 
     return (
-        <section className="py-24 bg-brand-surface1 border-t border-brand-surface2 overflow-hidden relative min-h-[400px] flex flex-col justify-center font-body">
+        <section className="py-12 md:py-24 bg-brand-surface1 border-t border-brand-surface2 overflow-hidden relative min-h-[350px] md:min-h-[400px] flex flex-col justify-center font-body">
             <div className="max-w-7xl mx-auto px-4 relative z-10 w-full mb-4">
                 <div className="text-center mb-16 space-y-4">
                     <motion.h3
@@ -129,6 +129,9 @@ const StacksWaveSection: React.FC = () => {
                 <div
                     className="relative flex justify-center items-center h-[280px] w-full"
                 >
+                    {/* Soft gradients for edge fading restricted to the track so they do not blur text */}
+                    <div className="absolute top-0 left-0 w-12 md:w-32 h-full bg-gradient-to-r from-brand-surface1 to-transparent pointer-events-none z-30" />
+                    <div className="absolute top-0 right-0 w-12 md:w-32 h-full bg-gradient-to-l from-brand-surface1 to-transparent pointer-events-none z-30" />
 
                     {/* Draggable surface */}
                     <motion.div
@@ -152,12 +155,7 @@ const StacksWaveSection: React.FC = () => {
                     </motion.div>
                 </div>
             </div>
-
-            {/* Soft gradients for edge fading */}
-            <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-brand-surface1 to-transparent pointer-events-none z-30" />
-            <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-brand-surface1 to-transparent pointer-events-none z-30" />
-            <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-brand-surface1 to-transparent pointer-events-none z-30" />
-        </section>
+        </section >
     );
 };
 
