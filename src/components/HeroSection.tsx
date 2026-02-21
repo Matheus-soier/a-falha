@@ -3,39 +3,46 @@ import { motion } from 'framer-motion';
 import { TerminalSquare, ChevronRight } from 'lucide-react';
 
 const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
-    const [displayText, setDisplayText] = useState('');
-    const letters = '01-_/\\*';
+    const [displayText, setDisplayText] = useState(text);
+    const letters = '01-_/\\*{}[]<>~';
 
     useEffect(() => {
-        let iteration = 0;
-        let interval: any = null;
+        const glitchInterval = setInterval(() => {
+            // Random chance to trigger a glitch (e.g. 30% chance every 1.5s)
+            if (Math.random() > 0.3) return;
 
-        setTimeout(() => {
-            interval = setInterval(() => {
-                setDisplayText(
-                    text.split('')
-                        .map((char, index) => {
-                            if (index < iteration) return char;
-                            if (char === ' ') return ' ';
-                            return letters[Math.floor(Math.random() * letters.length)];
-                        })
-                        .join('')
-                );
+            // Pick 1 or 2 random indexes to glitch
+            const numGlitches = Math.random() > 0.8 ? 2 : 1;
+            const originalChars = text.split('');
+            const glitchIndexes: number[] = [];
 
-                if (iteration >= text.length) {
-                    clearInterval(interval);
-                    setDisplayText(text);
-                }
+            for (let i = 0; i < numGlitches; i++) {
+                let idx;
+                // find a non-space character
+                do {
+                    idx = Math.floor(Math.random() * text.length);
+                } while (originalChars[idx] === ' ' && text.length > 0);
+                glitchIndexes.push(idx);
+            }
 
-                // Faster iteration for a more subtle, quicker effect
-                iteration += 1 / 1.5;
-            }, 40);
-        }, 500); // Less initial delay
+            // Apply glitch characters
+            const glitchedChars = [...originalChars];
+            glitchIndexes.forEach(idx => {
+                glitchedChars[idx] = letters[Math.floor(Math.random() * letters.length)];
+            });
+            setDisplayText(glitchedChars.join(''));
 
-        return () => clearInterval(interval);
+            // Revert back quickly (e.g., 50ms - 150ms)
+            setTimeout(() => {
+                setDisplayText(text);
+            }, 50 + Math.random() * 100);
+
+        }, 1500); // Check every 1.5s if a glitch should happen
+
+        return () => clearInterval(glitchInterval);
     }, [text]);
 
-    return <>{displayText || ' '.repeat(text.length)}</>;
+    return <>{displayText}</>;
 };
 
 const HeroSection: React.FC = () => {
