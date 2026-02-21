@@ -4,13 +4,12 @@ import { TerminalSquare, ChevronRight } from 'lucide-react';
 
 const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
     const [displayText, setDisplayText] = useState('');
-    const letters = '01#@$%&<>*{}[]|\\/?~XYZ';
+    const letters = '01-_/\\*';
 
     useEffect(() => {
         let iteration = 0;
         let interval: any = null;
 
-        // Slight delay before scramble starts for dramatic effect
         setTimeout(() => {
             interval = setInterval(() => {
                 setDisplayText(
@@ -28,9 +27,10 @@ const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
                     setDisplayText(text);
                 }
 
-                iteration += 1 / 3;
-            }, 30);
-        }, 800);
+                // Faster iteration for a more subtle, quicker effect
+                iteration += 1 / 1.5;
+            }, 40);
+        }, 500); // Less initial delay
 
         return () => clearInterval(interval);
     }, [text]);
