@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Css3DPill } from './Css3DPill';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, ArrowRight, Loader2, X } from 'lucide-react';
 
@@ -53,8 +52,10 @@ const questions = [
 const PricingSection: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPill, setSelectedPill] = useState<'blue' | 'red' | null>(null);
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0); // Step 0 is the lead capture form
     const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [leadData, setLeadData] = useState({ nome: '', email: '', whatsapp: '' });
+    const [leadErrors, setLeadErrors] = useState({ nome: '', email: '', whatsapp: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Prevent body scroll when modal is open
@@ -65,8 +66,10 @@ const PricingSection: React.FC = () => {
             document.body.style.overflow = 'unset';
             // Reset modal state when closed after animation finishes
             setTimeout(() => {
-                setStep(1);
+                setStep(0);
                 setAnswers({});
+                setLeadData({ nome: '', email: '', whatsapp: '' });
+                setLeadErrors({ nome: '', email: '', whatsapp: '' });
                 setSelectedPill(null);
                 setIsSubmitting(false);
             }, 300);
@@ -81,47 +84,112 @@ const PricingSection: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleOptionSelect = (qId: string, option: string) => {
-        setAnswers(prev => ({ ...prev, [qId]: option }));
+    const validateLeadForm = () => {
+        let isValid = true;
+        const errors = { nome: '', email: '', whatsapp: '' };
+
+        if (!leadData.nome.trim()) {
+            errors.nome = 'O nome é obrigatório.';
+            isValid = false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!leadData.email.trim() || !emailRegex.test(leadData.email)) {
+            errors.email = 'Insira um e-mail válido.';
+            isValid = false;
+        }
+
+        // Extracts all numbers, needs to be at least 10 digits (DDD + 8 or 9 digits)
+        const numericPhone = leadData.whatsapp.replace(/\D/g, '');
+        if (!leadData.whatsapp.trim() || numericPhone.length < 10) {
+            errors.whatsapp = 'Insira um WhatsApp válido com DDD.';
+            isValid = false;
+        }
+
+        setLeadErrors(errors);
+        return isValid;
+    };
+
+    const handleOptionSelect = async (qId: string, option: string) => {
+        const newAnswers = { ...answers, [qId]: option };
+        setAnswers(newAnswers);
 
         // Auto-advance
-        setTimeout(() => {
-            if (step < questions.length) {
+        if (step < questions.length) {
+            setTimeout(() => {
                 setStep(step + 1);
-            } else {
-                setIsSubmitting(true);
-                setTimeout(() => {
-                    setIsSubmitting(false);
-                    setStep(questions.length + 1); // Success step / Price Reveal
-                }, 1000);
+            }, 350);
+        } else {
+            setIsSubmitting(true);
+
+            // Optional: The URL below corresponds to the Google Apps Script Webhook
+            // This URL will be replaced later or can be injected from .env
+            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwLbLcWgXxttac9ofFZJtx-c1yi0wlNrrf9yGC_USpFZTvXGyZHPiL3CXSq3gimzILzCw/exec';
+
+            const captureUTMs = () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                return {
+                    utm_source: urlParams.get('utm_source') || '',
+                    utm_medium: urlParams.get('utm_medium') || '',
+                    utm_campaign: urlParams.get('utm_campaign') || '',
+                    referrer: document.referrer || ''
+                };
+            };
+
+            const payload = {
+                leadData,
+                answers: newAnswers,
+                score: calculateScore(newAnswers),
+                utmData: captureUTMs(),
+                pageUrl: window.location.href
+            };
+
+            try {
+                if (WEBHOOK_URL) {
+                    await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                }
+            } catch (err) {
+                console.error("Erro ao salvar lead:", err);
             }
-        }, 350);
+
+            setTimeout(() => {
+                setIsSubmitting(false);
+                setStep(questions.length + 1); // Success step / Price Reveal
+            }, 600);
+        }
     };
 
     const handleCheckout = () => {
         window.location.href = '#checkout-url';
     };
 
-    const calculateScore = () => {
+    const calculateScore = (currentAnswers: Record<string, string>) => {
         let score = 0;
 
-        const q3Index = questions[2].options.indexOf(answers['q3']);
+        const q3Index = questions[2].options.indexOf(currentAnswers['q3']);
         if (q3Index !== -1 && questions[2].scores) score += questions[2].scores[q3Index];
 
-        const q4Index = questions[3].options.indexOf(answers['q4']);
+        const q4Index = questions[3].options.indexOf(currentAnswers['q4']);
         if (q4Index !== -1 && questions[3].scores) score += questions[3].scores[q4Index];
 
-        const q5Index = questions[4].options.indexOf(answers['q5']);
+        const q5Index = questions[4].options.indexOf(currentAnswers['q5']);
         if (q5Index !== -1 && questions[4].scores) score += questions[4].scores[q5Index];
 
-        const q8Index = questions[7].options.indexOf(answers['q8']);
+        const q8Index = questions[7].options.indexOf(currentAnswers['q8']);
         if (q8Index !== -1 && questions[7].scores) score += questions[7].scores[q8Index];
 
         return score;
     };
 
     const getSegmentMessage = () => {
-        const score = calculateScore();
+        const score = calculateScore(answers);
         if (score <= 8) return 'Você precisa de base sólida pra não perder tempo com retrabalho.';
         if (score <= 13) return 'Você já opera — agora falta padrão, tracking confiável e rotina.';
         return 'Você está pronto pra auditoria, automação e consistência em alto nível.';
@@ -185,32 +253,18 @@ const PricingSection: React.FC = () => {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.1),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col items-center h-full">
-                            {/* Graphic 3D CSS Pill */}
-                            <div
-                                className="mb-[60px] mt-[30px] flex justify-center cursor-pointer perspective-[1000px] h-32 w-16"
+                            {/* Graphic */}
+                            <motion.div
+                                animate={{ y: [-10, 10, -10] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="mb-6 flex justify-center cursor-pointer"
                                 onClick={() => openModal('blue')}
                             >
-                                <motion.div
-                                    animate={{
-                                        y: [-10, 10, -10],
-                                        rotateX: [-15, 15, -15],
-                                        rotateY: [0, 360]
-                                    }}
-                                    transition={{
-                                        y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-                                        rotateX: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
-                                        rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
-                                    }}
-                                    className="relative w-full h-full"
-                                    style={{ transformStyle: "preserve-3d" }}
-                                >
-                                    <Css3DPill
-                                        colorMain="#3B82F6"
-                                        colorShadow="#1E3A8A"
-                                        glowColor="rgba(59,130,246,0.5)"
-                                    />
-                                </motion.div>
-                            </div>
+                                <div className="w-16 h-32 rounded-full relative overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_30px_rgba(59,130,246,0.5)] bg-gradient-to-b from-blue-500 to-blue-900 group-hover:shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_50px_rgba(59,130,246,0.8)] transition-all duration-500">
+                                    <div className="absolute top-[5px] left-[10px] w-[15px] h-[80px] bg-gradient-to-b from-white/80 to-transparent rounded-[10px] -rotate-12 blur-[1px] z-10" />
+                                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-black/30 -translate-y-1/2 z-10" />
+                                </div>
+                            </motion.div>
 
                             <h3 className="text-3xl font-heading font-extrabold text-blue-400 mb-2 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">A Pílula Azul</h3>
                             <p className="text-sm font-mono text-blue-100/50 mb-6 uppercase tracking-widest text-center">Ficar no País das Maravilhas</p>
@@ -256,32 +310,18 @@ const PricingSection: React.FC = () => {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.1),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col items-center h-full">
-                            {/* Graphic 3D CSS Pill */}
-                            <div
-                                className="mb-[60px] mt-[30px] flex justify-center cursor-pointer perspective-[1000px] h-32 w-16"
+                            {/* Graphic */}
+                            <motion.div
+                                animate={{ y: [-10, 10, -10] }}
+                                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                className="mb-6 flex justify-center cursor-pointer"
                                 onClick={() => openModal('red')}
                             >
-                                <motion.div
-                                    animate={{
-                                        y: [-10, 10, -10],
-                                        rotateX: [-15, 15, -15],
-                                        rotateY: [0, -360]
-                                    }}
-                                    transition={{
-                                        y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
-                                        rotateX: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
-                                        rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
-                                    }}
-                                    className="relative w-full h-full"
-                                    style={{ transformStyle: "preserve-3d" }}
-                                >
-                                    <Css3DPill
-                                        colorMain="#EF4444"
-                                        colorShadow="#7F1D1D"
-                                        glowColor="rgba(239,68,68,0.5)"
-                                    />
-                                </motion.div>
-                            </div>
+                                <div className="w-16 h-32 rounded-full relative overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_40px_rgba(239,68,68,0.7)] bg-gradient-to-b from-red-600 to-red-950 group-hover:shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_60px_rgba(239,68,68,0.9)] transition-all duration-500">
+                                    <div className="absolute top-[5px] left-[10px] w-[15px] h-[80px] bg-gradient-to-b from-white/80 to-transparent rounded-[10px] -rotate-12 blur-[1px] z-10" />
+                                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-black/40 -translate-y-1/2 z-10" />
+                                </div>
+                            </motion.div>
 
                             <h3 className="text-3xl font-heading font-extrabold text-red-500 mb-2 tracking-tight drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">A Pílula Vermelha</h3>
                             <p className="text-sm font-mono text-red-500 mb-6 uppercase tracking-widest text-center">Acesso Root ao &lt;Kernel/&gt;</p>
@@ -339,7 +379,86 @@ const PricingSection: React.FC = () => {
                             </button>
 
                             <AnimatePresence mode="popLayout">
-                                {step <= questions.length ? (
+                                {step === 0 ? (
+                                    <motion.div
+                                        key="lead-form"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className={`w-full space-y-4 sm:space-y-6 bg-[#0b1011] border border-brand-surface2 rounded-sm p-6 sm:p-8 ${themeColorShadowLarge}`}
+                                    >
+                                        <div className="mb-6">
+                                            {selectedPill === 'blue' ? (
+                                                <h4 className="text-xl sm:text-2xl font-heading font-bold text-blue-400 mb-2">Ok. Vamos direto ao ponto.</h4>
+                                            ) : (
+                                                <h4 className="text-xl sm:text-2xl font-heading font-bold text-red-500 mb-2">Você escolheu enxergar a Falha.</h4>
+                                            )}
+                                            <p className="text-brand-muted font-body text-sm sm:text-base leading-relaxed">
+                                                Para começarmos, preencha seus dados básicos de acesso abaixo.
+                                            </p>
+                                        </div>
+
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                if (validateLeadForm()) {
+                                                    setStep(1);
+                                                }
+                                            }}
+                                            className="space-y-4"
+                                        >
+                                            <div>
+                                                <label className="block text-brand-text font-mono text-xs uppercase tracking-widest mb-1.5">Nome</label>
+                                                <input
+                                                    type="text"
+                                                    value={leadData.nome}
+                                                    onChange={e => {
+                                                        setLeadData({ ...leadData, nome: e.target.value });
+                                                        if (leadErrors.nome) setLeadErrors({ ...leadErrors, nome: '' });
+                                                    }}
+                                                    className={`w-full bg-[#070A0A] border ${leadErrors.nome ? 'border-red-500/50 focus:border-red-500' : 'border-brand-surface2 focus:border-brand-neon'} rounded-sm px-4 py-3 text-brand-text focus:outline-none transition-colors`}
+                                                    placeholder="Seu nome completo"
+                                                />
+                                                {leadErrors.nome && <span className="text-red-500 text-xs mt-1 block">{leadErrors.nome}</span>}
+                                            </div>
+                                            <div>
+                                                <label className="block text-brand-text font-mono text-xs uppercase tracking-widest mb-1.5">E-mail principal</label>
+                                                <input
+                                                    type="email"
+                                                    value={leadData.email}
+                                                    onChange={e => {
+                                                        setLeadData({ ...leadData, email: e.target.value });
+                                                        if (leadErrors.email) setLeadErrors({ ...leadErrors, email: '' });
+                                                    }}
+                                                    className={`w-full bg-[#070A0A] border ${leadErrors.email ? 'border-red-500/50 focus:border-red-500' : 'border-brand-surface2 focus:border-brand-neon'} rounded-sm px-4 py-3 text-brand-text focus:outline-none transition-colors`}
+                                                    placeholder="seu@melhoremail.com"
+                                                />
+                                                {leadErrors.email && <span className="text-red-500 text-xs mt-1 block">{leadErrors.email}</span>}
+                                            </div>
+                                            <div>
+                                                <label className="block text-brand-text font-mono text-xs uppercase tracking-widest mb-1.5">WhatsApp</label>
+                                                <input
+                                                    type="tel"
+                                                    value={leadData.whatsapp}
+                                                    onChange={e => {
+                                                        setLeadData({ ...leadData, whatsapp: e.target.value });
+                                                        if (leadErrors.whatsapp) setLeadErrors({ ...leadErrors, whatsapp: '' });
+                                                    }}
+                                                    className={`w-full bg-[#070A0A] border ${leadErrors.whatsapp ? 'border-red-500/50 focus:border-red-500' : 'border-brand-surface2 focus:border-brand-neon'} rounded-sm px-4 py-3 text-brand-text focus:outline-none transition-colors`}
+                                                    placeholder="(11) 99999-9999"
+                                                />
+                                                {leadErrors.whatsapp && <span className="text-red-500 text-xs mt-1 block">{leadErrors.whatsapp}</span>}
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                className={`w-full mt-6 py-4 rounded-sm font-heading font-black text-white ${themeColorBg} hover:brightness-110 flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(42,245,152,0.1)]`}
+                                            >
+                                                Continuar <ArrowRight className="w-5 h-5" />
+                                            </button>
+                                        </form>
+                                    </motion.div>
+                                ) : step <= questions.length ? (
                                     <motion.div
                                         key="form"
                                         initial={{ opacity: 0, x: 20 }}
@@ -347,31 +466,34 @@ const PricingSection: React.FC = () => {
                                         exit={{ opacity: 0, x: -20 }}
                                         className={`w-full space-y-4 sm:space-y-6 bg-[#0b1011] border border-brand-surface2 rounded-sm p-6 sm:p-8 ${themeColorShadowLarge}`}
                                     >
-                                        <div className="mb-2">
-                                            {selectedPill === 'blue' ? (
-                                                <h4 className="text-xl sm:text-2xl font-heading font-bold text-blue-400 mb-2">Ok. Vamos direto ao ponto.</h4>
-                                            ) : (
-                                                <h4 className="text-xl sm:text-2xl font-heading font-bold text-red-500 mb-2">Você escolheu enxergar a Falha.</h4>
-                                            )}
+                                        {/* We only show the greeting header if it's step 1 anymore since step 0 had it (optional, but good) */}
+                                        {step === 1 && (
+                                            <>
+                                                {selectedPill === 'blue' ? (
+                                                    <h4 className="text-xl sm:text-2xl font-heading font-bold text-blue-400 mb-2">Quase lá.</h4>
+                                                ) : (
+                                                    <h4 className="text-xl sm:text-2xl font-heading font-bold text-red-500 mb-2">Excelente.</h4>
+                                                )}
 
-                                            <p className="text-brand-muted font-body text-sm sm:text-base mb-4 leading-relaxed">
-                                                {selectedPill === 'blue'
-                                                    ? 'Responde rápido essas perguntas (leva 40 segundos). No final eu te mostro a melhor forma de entrar na A Falha com clareza e sem achismo.'
-                                                    : 'Responde rápido essas perguntas (leva 40 segundos). No final eu te mostro o caminho mais eficiente pra operar com IA + tráfego + automação nos próximos 12 meses.'}
-                                            </p>
+                                                <p className="text-brand-muted font-body text-sm sm:text-base mb-4 leading-relaxed">
+                                                    {selectedPill === 'blue'
+                                                        ? 'Responda rápido essas perguntas (leva 40 segundos). No final eu te mostro a melhor forma de entrar na A Falha com clareza e sem achismo.'
+                                                        : 'Responda rápido essas perguntas (leva 40 segundos). No final eu te mostro o caminho mais eficiente pra operar com IA + tráfego + automação nos próximos 12 meses.'}
+                                                </p>
+                                            </>
+                                        )}
 
-                                            {/* Progress Bar */}
-                                            <div className="flex flex-col gap-2 mb-2">
-                                                <div className={`flex justify-between text-xs font-mono uppercase tracking-widest ${themeColorText}`}>
-                                                    <span>Progresso</span>
-                                                    <span>{step}/{questions.length}</span>
-                                                </div>
-                                                <div className="h-1.5 w-full bg-brand-surface2 rounded-full overflow-hidden">
-                                                    <div
-                                                        className={`h-full transition-all duration-300 ${themeColorBg} ${themeColorShadow}`}
-                                                        style={{ width: `${(step / questions.length) * 100}%` }}
-                                                    />
-                                                </div>
+                                        {/* Progress Bar */}
+                                        <div className="flex flex-col gap-2 mb-2">
+                                            <div className={`flex justify-between text-xs font-mono uppercase tracking-widest ${themeColorText}`}>
+                                                <span>Progresso</span>
+                                                <span>{step}/{questions.length}</span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-brand-surface2 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full transition-all duration-300 ${themeColorBg} ${themeColorShadow}`}
+                                                    style={{ width: `${(step / questions.length) * 100}%` }}
+                                                />
                                             </div>
                                         </div>
 
@@ -404,11 +526,19 @@ const PricingSection: React.FC = () => {
                                         </div>
 
                                         <div className="pt-2 flex justify-between items-center gap-4">
-                                            {step > 1 && (
+                                            {step > 1 ? (
                                                 <button
                                                     type="button"
                                                     onClick={() => setStep(step - 1)}
-                                                    className="py-2 px-4 sm:py-3 sm:px-6 border border-brand-surface2 text-brand-muted hover:text-brand-text hover:border-brand-surface2/80 rounded-sm font-mono text-xs sm:text-sm tracking-wide transition-all"
+                                                    className="py-2 px-4 sm:py-3 sm:px-6 border border-brand-surface2 text-brand-muted hover:text-brand-text hover:border-brand-surface2/80 rounded-sm font-mono text-xs sm:text-sm tracking-wide transition-all cursor-pointer"
+                                                >
+                                                    Voltar
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setStep(0)}
+                                                    className="py-2 px-4 sm:py-3 sm:px-6 border border-brand-surface2 text-brand-muted hover:text-brand-text hover:border-brand-surface2/80 rounded-sm font-mono text-xs sm:text-sm tracking-wide transition-all cursor-pointer"
                                                 >
                                                     Voltar
                                                 </button>
@@ -477,7 +607,7 @@ const PricingSection: React.FC = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </section>
+        </section >
     );
 };
 

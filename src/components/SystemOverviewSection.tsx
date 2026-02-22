@@ -11,8 +11,8 @@ const pillars = [
     },
     {
         number: "02",
-        title: "Assets de Conversão (Lovable)",
-        description: "Crie páginas e formulários clonáveis no Lovable: LPs de alta conversão, multi-step, roteamento e base pronta para testes (CRO).",
+        title: "Assets de Conversão (Lovable, AntiGravity, Cursor, Claude Code)",
+        description: "Crie páginas e formulários clonáveis utilizando Lovable, AntiGravity, Cursor e Claude Code: LPs de alta conversão, multi-step, roteamento e base pronta para testes (CRO).",
         icon: <MousePointerClick className="w-10 h-10 text-brand-neon" />
     },
     {

@@ -49,7 +49,7 @@ const ProblemSection: React.FC = () => {
                                 ]
                             }}
                             transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 4, ease: "linear" }}
-                            className="text-transparent bg-clip-text bg-gradient-to-r from-brand-warning to-red-400 inline-block relative"
+                            className="text-transparent bg-clip-text bg-gradient-to-r from-brand-warning to-red-400 inline-block relative pb-2"
                         >
                             fragmentada?
                         </motion.span>

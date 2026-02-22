@@ -33,7 +33,7 @@ const SocialProofSection: React.FC = () => {
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-                        className="w-full max-w-2xl bg-brand-surface1 rounded-sm border border-brand-surface2 hover:border-brand-neon/50 flex flex-col items-center justify-center p-12 overflow-hidden relative group transition-all duration-500 shadow-sm hover:shadow-[0_0_30px_rgba(42,245,152,0.15)] mt-10"
+                        className="w-full max-w-2xl bg-brand-surface1 rounded-sm border border-brand-surface2 hover:border-brand-neon/50 flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden relative group transition-all duration-500 shadow-sm hover:shadow-[0_0_30px_rgba(42,245,152,0.15)] mt-6 md:mt-10"
                     >
                         {/* Immersive background glow */}
                         <div className="absolute inset-0 bg-gradient-to-br from-brand-neon/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -44,7 +44,7 @@ const SocialProofSection: React.FC = () => {
                         </div>
 
                         {/* Matrix Hands Animation (Split Images for Offering Effect) */}
-                        <div className="relative z-10 w-full max-w-[1000px] h-[450px] md:h-[550px] mt-6 mb-8 mx-auto flex justify-center items-center">
+                        <div className="relative z-10 w-full max-w-[1000px] h-[220px] sm:h-[350px] md:h-[550px] mt-8 md:mt-6 mb-6 md:mb-8 mx-auto flex justify-center items-center">
                             {/* Left Hand (Blue Pill) */}
                             <motion.div
                                 className="w-1/2 h-full relative"

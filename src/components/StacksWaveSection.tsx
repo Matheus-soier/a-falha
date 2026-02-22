@@ -125,14 +125,10 @@ const StacksWaveSection: React.FC = () => {
                     </motion.p>
                 </div>
 
-                {/* The Infinite Wave Track */}
+                {/* The Infinite Wave Track (Desktop Only) */}
                 <div
-                    className="relative flex justify-center items-center h-[280px] w-full"
+                    className="relative hidden md:flex justify-center items-center h-[280px] w-full"
                 >
-                    {/* Soft gradients for edge fading restricted to the track so they do not blur text */}
-                    <div className="absolute top-0 left-0 w-12 md:w-32 h-full bg-gradient-to-r from-brand-surface1 to-transparent pointer-events-none z-30" />
-                    <div className="absolute top-0 right-0 w-12 md:w-32 h-full bg-gradient-to-l from-brand-surface1 to-transparent pointer-events-none z-30" />
-
                     {/* Draggable surface */}
                     <motion.div
                         className="absolute inset-0 z-20 cursor-grab active:cursor-grabbing"
@@ -153,6 +149,22 @@ const StacksWaveSection: React.FC = () => {
                             />
                         ))}
                     </motion.div>
+                </div>
+
+                {/* Mobile Grid View (Mobile Only) */}
+                <div className="grid grid-cols-3 gap-y-8 gap-x-4 md:hidden mt-8 w-full max-w-sm mx-auto">
+                    {baseIcons.map((item, i) => (
+                        <div key={`mobile-icon-${i}`} className="flex flex-col items-center justify-start gap-3">
+                            <div className="flex items-center justify-center bg-brand-surface2 border border-brand-cyan/20 rounded-full w-16 h-16 shadow-sm">
+                                <div className="w-full h-full flex items-center justify-center p-[26%]">
+                                    {item.icon}
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-mono font-medium text-brand-neon text-center whitespace-normal leading-tight">
+                                {item.name}
+                            </span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section >

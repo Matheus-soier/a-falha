@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TerminalSquare, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
     const [displayText, setDisplayText] = useState(text);
@@ -69,8 +69,8 @@ const HeroSection: React.FC = () => {
                     transition={{ type: "spring", stiffness: 150, damping: 25 }}
                     className="inline-flex items-center gap-2 px-5 py-2 rounded-sm bg-brand-surface1 border border-brand-surface2 text-brand-neon text-xs sm:text-sm font-mono tracking-widest uppercase shadow-sm"
                 >
-                    <TerminalSquare className="w-4 h-4" />
-                    A Falha
+                    <img src="/logo-a-falha.png" alt="A Falha Logo" className="w-5 h-5 object-contain" />
+                    <span>A Falha</span>
                 </motion.div>
 
                 <motion.h1
