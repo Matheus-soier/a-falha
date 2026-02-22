@@ -43,17 +43,37 @@ const SocialProofSection: React.FC = () => {
                             [USER_IDENTIFICATION_PENDING]
                         </div>
 
-                        {/* Matrix Hands Animation (From User Image) */}
+                        {/* Matrix Hands Animation (Split Images for Offering Effect) */}
                         <div className="relative z-10 w-full max-w-[800px] h-[350px] md:h-[450px] mt-6 mb-8 mx-auto flex justify-center items-center">
+                            {/* Left Hand (Blue Pill) */}
                             <motion.div
-                                className="w-full h-full relative"
-                                animate={{ y: [-15, 10, -15] }}
+                                className="w-1/2 h-full relative"
+                                animate={{
+                                    y: [-15, 15, -15],
+                                    scale: [1, 1.05, 1]
+                                }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             >
                                 <img
-                                    src="/matrix-hands.png"
-                                    alt="Matrix Hands Blue/Red Pill"
-                                    className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(42,245,152,0.3)]"
+                                    src="/matrix-hand-left.png"
+                                    alt="Left Hand Blue Pill"
+                                    className="w-full h-full object-contain object-right drop-shadow-[0_0_20px_rgba(42,245,152,0.3)]"
+                                />
+                            </motion.div>
+
+                            {/* Right Hand (Red Pill) */}
+                            <motion.div
+                                className="w-1/2 h-full relative"
+                                animate={{
+                                    y: [15, -15, 15],
+                                    scale: [1.05, 1, 1.05]
+                                }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <img
+                                    src="/matrix-hand-right.png"
+                                    alt="Right Hand Red Pill"
+                                    className="w-full h-full object-contain object-left drop-shadow-[0_0_20px_rgba(42,245,152,0.3)]"
                                 />
                             </motion.div>
                         </div>
