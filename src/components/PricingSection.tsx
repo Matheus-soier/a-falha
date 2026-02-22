@@ -124,7 +124,7 @@ const PricingSection: React.FC = () => {
 
             // Optional: The URL below corresponds to the Google Apps Script Webhook
             // This URL will be replaced later or can be injected from .env
-            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwLbLcWgXxttac9ofFZJtx-c1yi0wlNrrf9yGC_USpFZTvXGyZHPiL3CXSq3gimzILzCw/exec';
+            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx4fMZT5WP7VFx4_j78vV3zEt4fPU7YwbR1tRTamgeYcWst8Pu1rz2Oa2K-uxg0llbE-Q/exec';
 
             const captureUTMs = () => {
                 const urlParams = new URLSearchParams(window.location.search);
