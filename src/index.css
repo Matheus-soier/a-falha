@@ -26,3 +26,95 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* IntroScreen Animations */
+.cyber-text-overlay {
+  position: absolute;
+  bottom: 12%;
+  width: 100%;
+  text-align: center;
+  color: rgba(30, 224, 135, 0.25);
+  font-family: 'Bevan', serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 12px;
+  text-shadow: 0 0 15px rgba(30, 224, 135, 0.15);
+  z-index: 10;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: fadeInUp 2s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flicker-1 {
+  animation: letreiro-falha-1 3s infinite;
+}
+
+.flicker-2 {
+  animation: letreiro-falha-2 4.5s infinite;
+}
+
+.flicker-3 {
+  animation: letreiro-falha-3 2s infinite;
+}
+
+@keyframes letreiro-falha-1 {
+
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(30, 224, 135, 0.15);
+  }
+
+  20%,
+  24%,
+  55% {
+    opacity: 0.1;
+    text-shadow: none;
+  }
+}
+
+@keyframes letreiro-falha-2 {
+
+  0%,
+  40%,
+  44%,
+  100% {
+    opacity: 1;
+  }
+
+  42% {
+    opacity: 0;
+  }
+}
+
+@keyframes letreiro-falha-3 {
+
+  0%,
+  8%,
+  12%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(30, 224, 135, 0.15);
+  }
+
+  10% {
+    opacity: 0.2;
+    text-shadow: none;
+  }
+}

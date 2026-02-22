@@ -12,364 +12,98 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
     const [showButton, setShowButton] = useState(false);
 
     useEffect(() => {
-        // Show the "Enter" button after 3 seconds so users who want to skip can do it.
+        // Show the "Enter" button after 3 seconds
         const btnTimer = setTimeout(() => setShowButton(true), 3000);
 
         if (!containerRef.current) return;
         const container = containerRef.current;
-        const cyberText = textRef.current;
 
         // @ts-ignore
         const THREE = window.THREE;
-        // @ts-ignore
-        const gsap = window.gsap;
 
-        if (!THREE || !gsap) {
-            console.error("Three.js or GSAP failed to load. Skipping intro.");
+        if (!THREE) {
+            console.error("Three.js failed to load. Skipping intro.");
             onComplete();
             return;
         }
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.0015);
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 4000);
-        camera.position.set(0, 0, 450);
+        // Orthographic camera for full screen quad
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enablePan = false;
-        controls.minDistance = 200;
-        controls.maxDistance = 600;
+        const uniforms = {
+            iTime: { value: 0 },
+            iResolution: { value: new THREE.Vector3(1, 1, 1) },
+        };
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-        scene.add(ambientLight);
+        const vertexShader = \`
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+        \`;
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        directionalLight.position.set(5, 3, 5);
-        scene.add(directionalLight);
+        const fragmentShader = \`
+        precision highp float;
 
-        const bangLight = new THREE.PointLight(0x1EE087, 0, 800);
-        bangLight.position.set(0, 0, 0);
-        scene.add(bangLight);
+        uniform float iTime;
+        uniform vec3 iResolution;
+        varying vec2 vUv;
 
-        const godLight = new THREE.PointLight(0x00ffff, 0, 1500);
-        scene.add(godLight);
-
-        const radius = 100;
-        let earthMesh: any, particlesMesh: any;
-        let particleStartPositions: any, particleCorePositions: any, particleExplosionPositions: any, particleTargetPositions: any;
-        const particleCount = 10000;
-
-        let robotGroup: any, head: any, shoulderL: any, elbowL: any, handL: any, shoulderR: any, elbowR: any, handR: any;
-        let holoMat: any, glowEyeMat: any;
-
-        function createTextAtlas() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024; canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return new THREE.CanvasTexture(canvas);
-
-            ctx.fillStyle = 'rgba(0,0,0,0)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 80px monospace';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-
-            const cols = 8, rows = 4;
-            const cellW = canvas.width / cols, cellH = canvas.height / rows;
-
-            for (let i = 0; i < 26; i++) {
-                const char = String.fromCharCode(65 + i);
-                const x = (i % cols) * cellW + cellW / 2;
-                const y = Math.floor(i / cols) * cellH + cellH / 2;
-                ctx.fillText(char, x, y);
-            }
-            return new THREE.CanvasTexture(canvas);
+        void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+            vec2 uv = fragCoord / iResolution.xy;
+            float d = length(uv - 0.5) * 2.0;
+            float t = d * d * 25.0 - iTime * 3.0;
+            d = (cos(t) * 0.5 + 0.5) * (1.0 - d);
+            vec3 col = 0.5 + 0.5 * cos(t / 20.0 + uv.xyx + vec3(0.0,2.0,4.0));
+            fragColor = vec4(col, d);
         }
 
-        function createParticles() {
-            const geometry = new THREE.BufferGeometry();
-            particleStartPositions = new Float32Array(particleCount * 3);
-            particleCorePositions = new Float32Array(particleCount * 3);
-            particleExplosionPositions = new Float32Array(particleCount * 3);
-            particleTargetPositions = new Float32Array(particleCount * 3);
-
-            const colorArray = new Float32Array(particleCount * 3);
-            const charIndices = new Float32Array(particleCount);
-            const colorBase = new THREE.Color(0x1EE087);
-
-            for (let i = 0; i < particleCount; i++) {
-                const startZ = Math.random() * 1000 + 400;
-                particleStartPositions[i * 3] = (Math.random() - 0.5) * 1500;
-                particleStartPositions[i * 3 + 1] = (Math.random() - 0.5) * 1500;
-                particleStartPositions[i * 3 + 2] = startZ;
-
-                const y = 1 - (i / (particleCount - 1)) * 2;
-                const r = Math.sqrt(1 - y * y);
-                const theta = i * 2.399963;
-
-                const coreRadius = 1.5;
-                particleCorePositions[i * 3] = Math.cos(theta) * r * coreRadius;
-                particleCorePositions[i * 3 + 1] = y * coreRadius;
-                particleCorePositions[i * 3 + 2] = Math.sin(theta) * r * coreRadius;
-
-                const explosionPower = radius * (2.5 + Math.random() * 5);
-                particleExplosionPositions[i * 3] = Math.cos(theta) * r * explosionPower;
-                particleExplosionPositions[i * 3 + 1] = y * explosionPower;
-                particleExplosionPositions[i * 3 + 2] = Math.sin(theta) * r * explosionPower;
-
-                particleTargetPositions[i * 3] = Math.cos(theta) * r * radius;
-                particleTargetPositions[i * 3 + 1] = y * radius;
-                particleTargetPositions[i * 3 + 2] = Math.sin(theta) * r * radius;
-
-                colorArray[i * 3] = colorBase.r;
-                colorArray[i * 3 + 1] = colorBase.g;
-                colorArray[i * 3 + 2] = colorBase.b;
-
-                if (startZ > 1100) {
-                    charIndices[i] = Math.random() > 0.5 ? 12 : 18;
-                } else {
-                    charIndices[i] = Math.floor(Math.random() * 26);
-                }
-            }
-
-            geometry.setAttribute('position', new THREE.BufferAttribute(particleStartPositions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-            geometry.setAttribute('charIndex', new THREE.BufferAttribute(charIndices, 1));
-
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTexture: { value: createTextAtlas() },
-                    uSize: { value: 45.0 },
-                    uOpacity: { value: 1.0 },
-                    uGlow: { value: 1.5 }
-                },
-                vertexShader: `
-                    attribute float charIndex;
-                    attribute vec3 color;
-                    varying vec3 vColor; varying float vCharIndex;
-                    uniform float uSize;
-                    void main() {
-                        vColor = color; vCharIndex = charIndex;
-                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                        gl_PointSize = uSize * (300.0 / -mvPosition.z);
-                        gl_Position = projectionMatrix * mvPosition;
-                    }
-                `,
-                fragmentShader: `
-                    uniform sampler2D uTexture;
-                    uniform float uOpacity; uniform float uGlow;
-                    varying vec3 vColor; varying float vCharIndex;
-                    void main() {
-                        float cols = 8.0; float rows = 4.0;
-                        float col = mod(vCharIndex, cols);
-                        float row = floor(vCharIndex / cols);
-                        vec2 uv = gl_PointCoord;
-                        uv.x = (col + uv.x) / cols;
-                        uv.y = 1.0 - ((row + 1.0 - uv.y) / rows);
-                        vec4 texColor = texture2D(uTexture, uv);
-                        if (texColor.a < 0.1) discard; 
-                        gl_FragColor = vec4(vColor * uGlow, texColor.a * 0.9 * uOpacity);
-                    }
-                `,
-                transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-            });
-
-            particlesMesh = new THREE.Points(geometry, material);
-            scene.add(particlesMesh);
+        void main() {
+            vec2 fragCoord = vUv * iResolution.xy;
+            vec4 color;
+            mainImage(color, fragCoord);
+            gl_FragColor = color;
         }
+        \`;
 
-        function createEarth() {
-            const textureLoader = new THREE.TextureLoader();
-            const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg', function () {
-                startBigBangAnimation();
-            });
+        const material = new THREE.ShaderMaterial({
+            uniforms,
+            vertexShader,
+            fragmentShader,
+            transparent: true,
+        });
 
-            const geometry = new THREE.SphereGeometry(radius - 1, 64, 64);
-            const material = new THREE.MeshStandardMaterial({
-                map: earthTexture,
-                transparent: true, opacity: 0,
-                roughness: 0.8, metalness: 0.1
-            });
-
-            earthMesh = new THREE.Mesh(geometry, material);
-            earthMesh.rotation.z = 23.5 * Math.PI / 180;
-            particlesMesh.rotation.z = 23.5 * Math.PI / 180;
-
-            // Make sure earth rotates independently, do not parent the robot to it.
-            scene.add(earthMesh);
-        }
-
-        function createRobot() {
-            robotGroup = new THREE.Group();
-
-            const textureLoader = new THREE.TextureLoader();
-            const robotTexture = textureLoader.load('/realistic_dark_robot.png');
-
-            // Using PlaneGeometry instead of Sprite for predictable dimensional scaling
-            const planeGeometry = new THREE.PlaneGeometry(500, 500);
-
-            const material = new THREE.MeshBasicMaterial({
-                map: robotTexture,
-                transparent: true,
-                opacity: 0,
-                depthWrite: false,
-                side: THREE.DoubleSide,
-                blending: THREE.NormalBlending
-            });
-
-            const robotMesh = new THREE.Mesh(planeGeometry, material);
-
-            holoMat = material; // Reuse for GSAP opacity animation
-            glowEyeMat = { opacity: 0 };
-
-            head = { rotation: { x: 0, y: 0, z: 0 } };
-            shoulderL = { rotation: { x: 0, y: 0, z: 0 } };
-            elbowL = { rotation: { x: 0, y: 0, z: 0 } };
-            handL = { rotation: { x: 0, y: 0, z: 0 } };
-            shoulderR = { rotation: { x: 0, y: 0, z: 0 } };
-            elbowR = { rotation: { x: 0, y: 0, z: 0 } };
-            handR = { rotation: { x: 0, y: 0, z: 0 } };
-
-            robotGroup.add(robotMesh);
-
-            // Centered behind the earth
-            robotGroup.position.set(0, 100, -150);
-
-            scene.add(robotGroup);
-        }
-
-        function startBigBangAnimation() {
-            createRobot();
-
-            const animProps = { p1: 0, p2: 0, p3: 0, earthOpacity: 0 };
-            const tl = gsap.timeline();
-
-            const updatePositions = () => {
-                const positions = particlesMesh.geometry.attributes.position.array;
-                for (let i = 0; i < particleCount; i++) {
-                    const idx = i * 3;
-                    let x = THREE.MathUtils.lerp(particleStartPositions[idx], particleCorePositions[idx], animProps.p1);
-                    let y = THREE.MathUtils.lerp(particleStartPositions[idx + 1], particleCorePositions[idx + 1], animProps.p1);
-                    let z = THREE.MathUtils.lerp(particleStartPositions[idx + 2], particleCorePositions[idx + 2], animProps.p1);
-
-                    if (animProps.p2 > 0) {
-                        x = THREE.MathUtils.lerp(x, particleExplosionPositions[idx], animProps.p2);
-                        y = THREE.MathUtils.lerp(y, particleExplosionPositions[idx + 1], animProps.p2);
-                        z = THREE.MathUtils.lerp(z, particleExplosionPositions[idx + 2], animProps.p2);
-                    }
-                    if (animProps.p3 > 0) {
-                        x = THREE.MathUtils.lerp(x, particleTargetPositions[idx], animProps.p3);
-                        y = THREE.MathUtils.lerp(y, particleTargetPositions[idx + 1], animProps.p3);
-                        z = THREE.MathUtils.lerp(z, particleTargetPositions[idx + 2], animProps.p3);
-                    }
-                    positions[idx] = x; positions[idx + 1] = y; positions[idx + 2] = z;
-                }
-                particlesMesh.geometry.attributes.position.needsUpdate = true;
-            };
-
-            tl.to(animProps, { p1: 1, duration: 4.0, ease: "expo.in", onUpdate: updatePositions }, 0);
-            tl.to(bangLight, { intensity: 8, duration: 3.9, ease: "expo.in" }, 0);
-            tl.to(particlesMesh.material.uniforms.uGlow, { value: 6.0, duration: 3.9, ease: "expo.in" }, 0);
-
-            tl.to(bangLight, { intensity: 20, duration: 0.1 }, 3.9);
-            tl.to(particlesMesh.material.uniforms.uGlow, { value: 12.0, duration: 0.1 }, 3.9);
-
-            tl.to(bangLight, { intensity: 0, duration: 2.5 }, 4.0);
-            tl.to(particlesMesh.material.uniforms.uGlow, { value: 1.5, duration: 2.0 }, 4.0);
-            tl.to(animProps, { p2: 1, duration: 0.8, ease: "expo.out", onUpdate: updatePositions }, 4.0);
-
-            tl.to(animProps, { p3: 1, duration: 3.5, ease: "power3.inOut", onUpdate: updatePositions }, 4.2);
-
-            tl.to(animProps, {
-                earthOpacity: 1, duration: 2.5, ease: "power2.inOut",
-                onUpdate: () => { earthMesh.material.opacity = animProps.earthOpacity; }
-            }, 5.7);
-
-            tl.to(particlesMesh.material.uniforms.uOpacity, { value: 0, duration: 2.0, ease: "power2.inOut" }, 6.0);
-
-            if (cyberText) {
-                tl.to(cyberText, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, 7.5);
-            }
-
-            const robTl = gsap.timeline({ delay: 4.5 });
-
-            // Animate opacity to 1.0 (fully visible)
-            robTl.to(holoMat, { opacity: 1.0, duration: 4.0, ease: "power2.inOut" }, 0);
-            robTl.to(glowEyeMat, { opacity: 0.8, duration: 4.0, ease: "power2.inOut" }, 0);
-            robTl.to(godLight, { intensity: 1.5, duration: 4.0 }, 0);
-
-            robTl.to(head.rotation, { x: Math.PI / 10, duration: 3, ease: "power2.inOut" }, 1.0);
-
-            const armDuration = 3.5;
-            const armEase = "power2.inOut";
-
-            robTl.to(shoulderL.rotation, { x: Math.PI / 2, z: -Math.PI / 4, duration: armDuration, ease: armEase }, 2.5);
-            robTl.to(elbowL.rotation, { x: -Math.PI / 1.5, duration: armDuration, ease: armEase }, 2.5);
-            robTl.to(handL.rotation, { z: Math.PI / 2, duration: armDuration, ease: armEase }, 2.5);
-
-            robTl.to(shoulderR.rotation, { x: Math.PI / 2, z: Math.PI / 4, duration: armDuration, ease: armEase }, 2.5);
-            robTl.to(elbowR.rotation, { x: -Math.PI / 1.5, duration: armDuration, ease: armEase }, 2.5);
-            robTl.to(handR.rotation, { z: -Math.PI / 2, duration: armDuration, ease: armEase }, 2.5);
-
-            robTl.to(head.rotation, { x: Math.PI / 6, duration: 3, ease: "power2.inOut" }, 4.0);
-
-            robTl.to({}, { duration: 2.0 }, 6.0);
-
-            const retractDuration = 3;
-            robTl.to(shoulderL.rotation, { x: 0, z: 0, duration: retractDuration, ease: armEase }, 8.0);
-            robTl.to(elbowL.rotation, { x: 0, duration: retractDuration, ease: armEase }, 8.0);
-            robTl.to(handL.rotation, { z: 0, duration: retractDuration, ease: armEase }, 8.0);
-
-            robTl.to(shoulderR.rotation, { x: 0, z: 0, duration: retractDuration, ease: armEase }, 8.0);
-            robTl.to(elbowR.rotation, { x: 0, duration: retractDuration, ease: armEase }, 8.0);
-            robTl.to(handR.rotation, { z: 0, duration: retractDuration, ease: armEase }, 8.0);
-
-            robTl.to(head.rotation, { x: 0, duration: retractDuration, ease: armEase }, 8.0);
-
-            // Fade out the robot at the end
-            robTl.to(holoMat, { opacity: 0, duration: 3.5, ease: "power2.inOut" }, 10.0);
-            robTl.to(glowEyeMat, { opacity: 0, duration: 3.5, ease: "power2.inOut" }, 10.0);
-            robTl.to(godLight, { intensity: 0, duration: 3.5 }, 10.0);
-        }
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+        scene.add(mesh);
 
         let isAnimating = true;
+        const clock = new THREE.Clock();
+
         function animate() {
             if (!isAnimating) return;
             requestAnimationFrame(animate);
 
-            if (earthMesh && particlesMesh) {
-                const rotationSpeed = 0.001;
-                earthMesh.rotation.y += rotationSpeed;
-                particlesMesh.rotation.y += rotationSpeed;
-            }
+            uniforms.iTime.value += clock.getDelta();
 
-            if (robotGroup) {
-                const time = Date.now() * 0.0005;
-                robotGroup.position.y = 100 + Math.sin(time) * 15;
-            }
-
-            controls.update();
             renderer.render(scene, camera);
         }
 
-        createParticles();
-        createEarth();
         animate();
 
         const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
         };
         window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
 
         return () => {
             isAnimating = false;
@@ -380,76 +114,37 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             }
             renderer.dispose();
             renderer.forceContextLoss();
-            gsap.globalTimeline.clear(); // Clear all GSAP animations
         };
     }, []);
 
-    return (
-        <div className="fixed inset-0 z-[100] bg-[#050505] font-body overflow-hidden">
-            <style>
-                {`
-                .cyber-text-overlay {
-                    position: absolute;
-                    bottom: 12%;
-                    width: 100%;
-                    text-align: center;
-                    color: rgba(30, 224, 135, 0.25); 
-                    font-family: 'Bevan', serif;
-                    font-size: clamp(2rem, 5vw, 4rem);
-                    letter-spacing: 12px;
-                    text-shadow: 0 0 15px rgba(30, 224, 135, 0.15);
-                    z-index: 10;
-                    opacity: 0;
-                    transform: translateY(30px);
-                    pointer-events: none;
-                    mix-blend-mode: screen; 
-                }
+return (
+    <div className="fixed inset-0 z-[100] bg-[#050505] font-body overflow-hidden">
 
-                .flicker-1 { animation: letreiro-falha-1 3s infinite; }
-                .flicker-2 { animation: letreiro-falha-2 4.5s infinite; }
-                .flicker-3 { animation: letreiro-falha-3 2s infinite; }
 
-                @keyframes letreiro-falha-1 {
-                    0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; text-shadow: 0 0 15px rgba(30, 224, 135, 0.15); }
-                    20%, 24%, 55% { opacity: 0.1; text-shadow: none; }
-                }
+        <div ref={containerRef} className="absolute inset-0 z-0" />
 
-                @keyframes letreiro-falha-2 {
-                    0%, 40%, 44%, 100% { opacity: 1; }
-                    42% { opacity: 0; }
-                }
-
-                @keyframes letreiro-falha-3 {
-                    0%, 8%, 12%, 100% { opacity: 1; text-shadow: 0 0 15px rgba(30, 224, 135, 0.15); }
-                    10% { opacity: 0.2; text-shadow: none; }
-                }
-                `}
-            </style>
-
-            <div ref={containerRef} className="absolute inset-0 z-0" />
-
-            <div ref={textRef} className="cyber-text-overlay">
-                A <span className="flicker-1">F</span>A<span className="flicker-2">L</span><span className="flicker-3">H</span>A
-            </div>
-
-            {/* Skip / Enter Button */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: showButton ? 1 : 0 }}
-                transition={{ duration: 1 }}
-                className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto"
-            >
-                <button
-                    onClick={onComplete}
-                    className="group flex items-center justify-center w-full md:w-auto mx-auto rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-mono font-bold text-brand-muted hover:text-brand-neon shadow-lg transition-all duration-300 hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-widest cursor-pointer"
-                >
-                    <span className="md:hidden">Acessar</span>
-                    <span className="hidden md:inline">Acessar a Nova Realidade</span>
-                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
-            </motion.div>
+        <div ref={textRef} className="cyber-text-overlay">
+            A <span className="flicker-1">F</span>A<span className="flicker-2">L</span><span className="flicker-3">H</span>A
         </div>
-    );
+
+        {/* Skip / Enter Button */}
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showButton ? 1 : 0 }}
+            transition={{ duration: 1 }}
+            className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto"
+        >
+            <button
+                onClick={onComplete}
+                className="group flex items-center justify-center w-full md:w-auto mx-auto rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-mono font-bold text-brand-muted hover:text-brand-neon shadow-lg transition-all duration-300 hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-widest cursor-pointer"
+            >
+                <span className="md:hidden">Acessar</span>
+                <span className="hidden md:inline">Acessar a Nova Realidade</span>
+                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+        </motion.div>
+    </div>
+);
 };
 
 export default IntroScreen;
