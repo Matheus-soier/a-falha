@@ -16,6 +16,8 @@ const baseIcons = [
     { icon: <img src="/stacks/openclaw.png" alt="Edtis" className="w-full h-full object-contain" />, name: "Edtis" },
     { icon: <img src="/stacks/prisma.png" alt="Google Ads" className="w-full h-full object-contain" />, name: "Google Ads" },
     { icon: <img src="/stacks/sparkles.png" alt="Claude" className="w-full h-full object-contain" />, name: "Claude" },
+    { icon: <img src="/stacks/lovable.png" alt="Lovable" className="w-full h-full object-contain" />, name: "Lovable" },
+    { icon: <img src="/stacks/atlas.png" alt="Atlas" className="w-full h-full object-contain" />, name: "Atlas" },
 ];
 
 // Duplicate to ensure seamless infinite looping track
