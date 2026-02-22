@@ -44,30 +44,32 @@ const SocialProofSection: React.FC = () => {
                         </div>
 
                         {/* Matrix Hands Animation (From User Image) */}
-                        <div className="relative z-10 flex w-full max-w-[500px] h-[250px] md:h-[300px] mt-6 mb-8 justify-center">
-                            {/* Left Hand (Blue Pill) */}
+                        <div className="relative z-10 w-full max-w-[600px] h-[250px] md:h-[350px] mt-6 mb-8 mx-auto">
+                            {/* Left Hand (Blue Pill) - Clipped to left half */}
                             <motion.div
-                                className="absolute left-0 inset-y-0 w-1/2 overflow-hidden flex justify-end"
+                                className="absolute inset-0 w-full h-full"
+                                style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }}
                                 animate={{ y: [-15, 10, -15] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             >
                                 <img
                                     src="/matrix-hands.png"
                                     alt="Left Hand Blue Pill"
-                                    className="absolute left-0 top-0 w-[200%] h-full object-contain object-left drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
                                 />
                             </motion.div>
 
-                            {/* Right Hand (Red Pill) */}
+                            {/* Right Hand (Red Pill) - Clipped to right half */}
                             <motion.div
-                                className="absolute right-0 inset-y-0 w-1/2 overflow-hidden flex justify-start"
+                                className="absolute inset-0 w-full h-full"
+                                style={{ clipPath: "polygon(50% 0, 100% 0, 100% 100%, 50% 100%)" }}
                                 animate={{ y: [10, -15, 10] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             >
                                 <img
                                     src="/matrix-hands.png"
                                     alt="Right Hand Red Pill"
-                                    className="absolute right-0 top-0 w-[200%] h-full object-contain object-right drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
                                 />
                             </motion.div>
                         </div>
