@@ -7,39 +7,39 @@ const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
     const letters = '01-_/\\*{}[]<>~';
 
     useEffect(() => {
-        const glitchInterval = setInterval(() => {
-            // Increased chance: 70% chance to glitch every 800ms
-            if (Math.random() > 0.7) return;
+        let isGlitching = false;
 
-            // Pick 1 to 4 random indexes to glitch to make it more noticeable
-            const numGlitches = Math.floor(Math.random() * 4) + 1; // 1 to 4 characters
-            const originalChars = text.split('');
-            const glitchIndexes: number[] = [];
+        const glitchLoop = setInterval(() => {
+            // Toggle glitch state rapidly
+            isGlitching = !isGlitching;
 
-            for (let i = 0; i < numGlitches; i++) {
-                let idx;
-                // find a non-space character
-                do {
-                    idx = Math.floor(Math.random() * text.length);
-                } while (originalChars[idx] === ' ' && text.length > 0);
-                glitchIndexes.push(idx);
-            }
+            if (isGlitching) {
+                // When glitching, pick 3 to 6 random characters to swap
+                const numGlitches = Math.floor(Math.random() * 4) + 3;
+                const originalChars = text.split('');
+                const glitchIndexes: number[] = [];
 
-            // Apply glitch characters
-            const glitchedChars = [...originalChars];
-            glitchIndexes.forEach(idx => {
-                glitchedChars[idx] = letters[Math.floor(Math.random() * letters.length)];
-            });
-            setDisplayText(glitchedChars.join(''));
+                for (let i = 0; i < numGlitches; i++) {
+                    let idx;
+                    do {
+                        idx = Math.floor(Math.random() * text.length);
+                    } while (originalChars[idx] === ' ' && text.length > 0);
+                    glitchIndexes.push(idx);
+                }
 
-            // Revert back slightly slower so the eye can catch it (100ms - 250ms)
-            setTimeout(() => {
+                const glitchedChars = [...originalChars];
+                glitchIndexes.forEach(idx => {
+                    glitchedChars[idx] = letters[Math.floor(Math.random() * letters.length)];
+                });
+
+                setDisplayText(glitchedChars.join(''));
+            } else {
+                // Return to normal briefly
                 setDisplayText(text);
-            }, 100 + Math.random() * 150);
+            }
+        }, 120); // Extremely fast interval (120ms) creates a continuous, chaotic buzz
 
-        }, 800); // Check more frequently (every 800ms)
-
-        return () => clearInterval(glitchInterval);
+        return () => clearInterval(glitchLoop);
     }, [text]);
 
     return <>{displayText}</>;
