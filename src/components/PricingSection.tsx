@@ -186,8 +186,12 @@ const PricingSection: React.FC = () => {
                         <div className="relative z-10 flex flex-col items-center h-full">
                             {/* Graphic */}
                             <motion.div
-                                animate={{ y: [-10, 10, -10] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                animate={{ y: [-10, 10, -10], rotateY: [0, 360] }}
+                                transition={{
+                                    y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                                    rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
+                                }}
+                                style={{ transformStyle: "preserve-3d" }}
                                 className="mb-6 flex justify-center cursor-pointer"
                                 onClick={() => openModal('blue')}
                             >
@@ -243,8 +247,12 @@ const PricingSection: React.FC = () => {
                         <div className="relative z-10 flex flex-col items-center h-full">
                             {/* Graphic */}
                             <motion.div
-                                animate={{ y: [-10, 10, -10] }}
-                                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                animate={{ y: [-10, 10, -10], rotateY: [0, -360] }}
+                                transition={{
+                                    y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+                                    rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
+                                }}
+                                style={{ transformStyle: "preserve-3d" }}
                                 className="mb-6 flex justify-center cursor-pointer"
                                 onClick={() => openModal('red')}
                             >
