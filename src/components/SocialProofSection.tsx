@@ -43,76 +43,33 @@ const SocialProofSection: React.FC = () => {
                             [USER_IDENTIFICATION_PENDING]
                         </div>
 
-                        {/* Matrix Hands Animation */}
-                        <div className="relative z-10 flex flex-col items-center mt-6 mb-8 w-full max-w-[400px] h-[250px] justify-center">
-                            <svg
-                                viewBox="0 0 400 300"
-                                className="w-full h-full drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                        {/* Matrix Hands Animation (From User Image) */}
+                        <div className="relative z-10 flex w-full max-w-[500px] h-[250px] md:h-[300px] mt-6 mb-8 justify-center">
+                            {/* Left Hand (Blue Pill) */}
+                            <motion.div
+                                className="absolute left-0 inset-y-0 w-1/2 overflow-hidden flex justify-end"
+                                animate={{ y: [-15, 10, -15] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             >
-                                <defs>
-                                    <linearGradient id="blue-pill-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#4A90E2" />
-                                        <stop offset="50%" stopColor="#0066FF" />
-                                        <stop offset="100%" stopColor="#003399" />
-                                    </linearGradient>
-                                    <linearGradient id="red-pill-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#FF6B6B" />
-                                        <stop offset="50%" stopColor="#E60000" />
-                                        <stop offset="100%" stopColor="#990000" />
-                                    </linearGradient>
-                                    <filter id="neon-glow-hand" x="-20%" y="-20%" width="140%" height="140%">
-                                        <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#2AF598" floodOpacity="0.4" />
-                                    </filter>
-                                    <filter id="glow-blue" x="-20%" y="-20%" width="140%" height="140%">
-                                        <feDropShadow dx="0" dy="0" stdDeviation="15" floodColor="#0066FF" floodOpacity="0.9" />
-                                    </filter>
-                                    <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
-                                        <feDropShadow dx="0" dy="0" stdDeviation="15" floodColor="#E60000" floodOpacity="0.9" />
-                                    </filter>
-                                </defs>
+                                <img
+                                    src="/matrix-hands.png"
+                                    alt="Left Hand Blue Pill"
+                                    className="absolute left-0 top-0 w-[200%] h-full object-contain object-left drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                                />
+                            </motion.div>
 
-                                {/* LEFT HAND (BLUE PILL) */}
-                                <motion.g animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-                                    {/* Hand Silhouette */}
-                                    <path d="M 0 200 C 20 195, 35 170, 40 150 C 45 100, 70 70, 95 80 C 105 85, 105 110, 95 130 C 120 90, 160 90, 160 115 C 160 130, 140 140, 125 140 C 160 130, 185 135, 185 160 C 185 175, 155 175, 140 170 C 165 170, 180 185, 170 205 C 160 220, 140 210, 130 200 C 150 210, 150 240, 135 250 C 115 260, 95 240, 80 250 C 70 255, 60 265, 50 270 C 30 280, 15 285, 0 280 Z" fill="#050808" stroke="#2AF598" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#neon-glow-hand)" />
-                                    {/* Inner Creases */}
-                                    <path d="M 40 150 C 60 160, 65 190, 50 230" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M 95 130 C 105 160, 95 190, 80 210" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M 75 160 C 85 175, 80 195, 65 210" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M 125 140 C 115 150, 110 160, 105 165" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M 140 170 C 125 180, 115 185, 105 185" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    <path d="M 130 200 C 115 205, 105 210, 95 205" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-
-                                    {/* Blue Pill */}
-                                    <g transform="translate(85, 160) rotate(15)">
-                                        <ellipse cx="0" cy="0" rx="30" ry="16" fill="url(#blue-pill-grad)" stroke="#1a8cff" strokeWidth="1.5" filter="url(#glow-blue)" />
-                                        <ellipse cx="-12" cy="-6" rx="10" ry="4" fill="#ffffff" opacity="0.6" transform="rotate(-15)" />
-                                        <path d="M -30 0 L 30 0" stroke="rgba(0,0,0,0.4)" strokeWidth="2" />
-                                    </g>
-                                </motion.g>
-
-                                {/* RIGHT HAND (RED PILL) */}
-                                <motion.g animate={{ y: [10, -10, 10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-                                    <g transform="translate(400, 0) scale(-1, 1)">
-                                        {/* Hand Silhouette */}
-                                        <path d="M 0 200 C 20 195, 35 170, 40 150 C 45 100, 70 70, 95 80 C 105 85, 105 110, 95 130 C 120 90, 160 90, 160 115 C 160 130, 140 140, 125 140 C 160 130, 185 135, 185 160 C 185 175, 155 175, 140 170 C 165 170, 180 185, 170 205 C 160 220, 140 210, 130 200 C 150 210, 150 240, 135 250 C 115 260, 95 240, 80 250 C 70 255, 60 265, 50 270 C 30 280, 15 285, 0 280 Z" fill="#050808" stroke="#2AF598" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#neon-glow-hand)" />
-                                        {/* Inner Creases */}
-                                        <path d="M 40 150 C 60 160, 65 190, 50 230" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M 95 130 C 105 160, 95 190, 80 210" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M 75 160 C 85 175, 80 195, 65 210" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M 125 140 C 115 150, 110 160, 105 165" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M 140 170 C 125 180, 115 185, 105 185" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M 130 200 C 115 205, 105 210, 95 205" fill="none" stroke="#2AF598" strokeWidth="1.5" strokeLinecap="round" />
-                                    </g>
-
-                                    {/* Red Pill */}
-                                    <g transform="translate(315, 160) rotate(-15)">
-                                        <ellipse cx="0" cy="0" rx="30" ry="16" fill="url(#red-pill-grad)" stroke="#ff4b4b" strokeWidth="1.5" filter="url(#glow-red)" />
-                                        <ellipse cx="-12" cy="-6" rx="10" ry="4" fill="#ffffff" opacity="0.6" transform="rotate(-15)" />
-                                        <path d="M -30 0 L 30 0" stroke="rgba(0,0,0,0.4)" strokeWidth="2" />
-                                    </g>
-                                </motion.g>
-                            </svg>
+                            {/* Right Hand (Red Pill) */}
+                            <motion.div
+                                className="absolute right-0 inset-y-0 w-1/2 overflow-hidden flex justify-start"
+                                animate={{ y: [10, -15, 10] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <img
+                                    src="/matrix-hands.png"
+                                    alt="Right Hand Red Pill"
+                                    className="absolute right-0 top-0 w-[200%] h-full object-contain object-right drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                                />
+                            </motion.div>
                         </div>
 
                         {/* Text */}
