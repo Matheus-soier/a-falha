@@ -44,32 +44,16 @@ const SocialProofSection: React.FC = () => {
                         </div>
 
                         {/* Matrix Hands Animation (From User Image) */}
-                        <div className="relative z-10 w-full max-w-[600px] h-[250px] md:h-[350px] mt-6 mb-8 mx-auto">
-                            {/* Left Hand (Blue Pill) - Clipped to left half */}
+                        <div className="relative z-10 w-full max-w-[800px] h-[350px] md:h-[450px] mt-6 mb-8 mx-auto flex justify-center items-center">
                             <motion.div
-                                className="absolute inset-0 w-full h-full"
-                                style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }}
+                                className="w-full h-full relative"
                                 animate={{ y: [-15, 10, -15] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             >
                                 <img
                                     src="/matrix-hands.png"
-                                    alt="Left Hand Blue Pill"
-                                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
-                                />
-                            </motion.div>
-
-                            {/* Right Hand (Red Pill) - Clipped to right half */}
-                            <motion.div
-                                className="absolute inset-0 w-full h-full"
-                                style={{ clipPath: "polygon(50% 0, 100% 0, 100% 100%, 50% 100%)" }}
-                                animate={{ y: [10, -15, 10] }}
-                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                                <img
-                                    src="/matrix-hands.png"
-                                    alt="Right Hand Red Pill"
-                                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(42,245,152,0.2)]"
+                                    alt="Matrix Hands Blue/Red Pill"
+                                    className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(42,245,152,0.3)]"
                                 />
                             </motion.div>
                         </div>
