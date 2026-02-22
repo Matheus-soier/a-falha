@@ -110,66 +110,6 @@ const PricingSection: React.FC = () => {
         return isValid;
     };
 
-    const handleOptionSelect = async (qId: string, option: string) => {
-        const newAnswers = { ...answers, [qId]: option };
-        setAnswers(newAnswers);
-
-        // Auto-advance
-        if (step < questions.length) {
-            setTimeout(() => {
-                setStep(step + 1);
-            }, 350);
-        } else {
-            setIsSubmitting(true);
-
-            // Optional: The URL below corresponds to the Google Apps Script Webhook
-            // This URL will be replaced later or can be injected from .env
-            const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx4fMZT5WP7VFx4_j78vV3zEt4fPU7YwbR1tRTamgeYcWst8Pu1rz2Oa2K-uxg0llbE-Q/exec';
-
-            const captureUTMs = () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                return {
-                    utm_source: urlParams.get('utm_source') || '',
-                    utm_medium: urlParams.get('utm_medium') || '',
-                    utm_campaign: urlParams.get('utm_campaign') || '',
-                    referrer: document.referrer || ''
-                };
-            };
-
-            const payload = {
-                leadData,
-                answers: newAnswers,
-                score: calculateScore(newAnswers),
-                utmData: captureUTMs(),
-                pageUrl: window.location.href
-            };
-
-            try {
-                if (WEBHOOK_URL) {
-                    await fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8',
-                        },
-                        body: JSON.stringify(payload)
-                    });
-                }
-            } catch (err) {
-                console.error("Erro ao salvar lead:", err);
-            }
-
-            setTimeout(() => {
-                setIsSubmitting(false);
-                setStep(questions.length + 1); // Success step / Price Reveal
-            }, 600);
-        }
-    };
-
-    const handleCheckout = () => {
-        window.location.href = '#checkout-url';
-    };
-
     const calculateScore = (currentAnswers: Record<string, string>) => {
         let score = 0;
 
@@ -186,6 +126,68 @@ const PricingSection: React.FC = () => {
         if (q8Index !== -1 && questions[7].scores) score += questions[7].scores[q8Index];
 
         return score;
+    };
+
+    const syncLeadData = async (currentLeadData: typeof leadData, currentAnswers: Record<string, string>) => {
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx4fMZT5WP7VFx4_j78vV3zEt4fPU7YwbR1tRTamgeYcWst8Pu1rz2Oa2K-uxg0llbE-Q/exec';
+
+        const captureUTMs = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                utm_source: urlParams.get('utm_source') || '',
+                utm_medium: urlParams.get('utm_medium') || '',
+                utm_campaign: urlParams.get('utm_campaign') || '',
+                referrer: document.referrer || ''
+            };
+        };
+
+        const payload = {
+            leadData: currentLeadData,
+            answers: currentAnswers,
+            score: calculateScore(currentAnswers),
+            utmData: captureUTMs(),
+            pageUrl: window.location.href
+        };
+
+        try {
+            if (WEBHOOK_URL) {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify(payload)
+                });
+            }
+        } catch (err) {
+            console.error("Erro ao salvar lead:", err);
+        }
+    };
+
+    const handleOptionSelect = async (qId: string, option: string) => {
+        const newAnswers = { ...answers, [qId]: option };
+        setAnswers(newAnswers);
+
+        // Progressively save data
+        syncLeadData(leadData, newAnswers);
+
+        // Auto-advance
+        if (step < questions.length) {
+            setTimeout(() => {
+                setStep(step + 1);
+            }, 350);
+        } else {
+            setIsSubmitting(true);
+            setTimeout(() => {
+                setIsSubmitting(false);
+                setStep(questions.length + 1); // Success step / Price Reveal
+            }, 600);
+        }
+    };
+
+    const handleCheckout = () => {
+        window.location.href = '#checkout-url';
     };
 
     const getSegmentMessage = () => {
@@ -402,6 +404,7 @@ const PricingSection: React.FC = () => {
                                             onSubmit={(e) => {
                                                 e.preventDefault();
                                                 if (validateLeadForm()) {
+                                                    syncLeadData(leadData, answers);
                                                     setStep(1);
                                                 }
                                             }}

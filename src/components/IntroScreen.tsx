@@ -203,132 +203,46 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             earthMesh.rotation.z = 23.5 * Math.PI / 180;
             particlesMesh.rotation.z = 23.5 * Math.PI / 180;
 
+            // Make sure earth rotates independently, do not parent the robot to it.
             scene.add(earthMesh);
         }
 
         function createRobot() {
             robotGroup = new THREE.Group();
 
-            holoMat = new THREE.MeshPhongMaterial({
-                color: 0xaaddff,
-                emissive: 0x052030,
+            const textureLoader = new THREE.TextureLoader();
+            const robotTexture = textureLoader.load('/realistic_dark_robot.png');
+
+            const spriteMaterial = new THREE.SpriteMaterial({
+                map: robotTexture,
                 transparent: true,
                 opacity: 0,
-                blending: THREE.AdditiveBlending,
                 depthWrite: false,
-                shininess: 100
+                blending: THREE.AdditiveBlending // gives it a magical/holographic summon feel initially
             });
 
-            glowEyeMat = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                transparent: true,
-                opacity: 0,
-                blending: THREE.AdditiveBlending
-            });
+            const robotSprite = new THREE.Sprite(spriteMaterial);
+            // Size it similarly to the previous geometry
+            robotSprite.scale.set(60, 60, 1);
 
-            const spineGeo = new THREE.CylinderGeometry(15, 12, 130, 32);
-            const spine = new THREE.Mesh(spineGeo, holoMat);
-            spine.position.y = 65;
-            robotGroup.add(spine);
+            holoMat = spriteMaterial; // Reuse the variable so the GSAP animation timeline still controls opacity
+            glowEyeMat = { opacity: 0 }; // Mock object since we don't have separate eyes anymore to animate
 
-            const chestGeo = new THREE.SphereGeometry(35, 32, 32);
-            const chest = new THREE.Mesh(chestGeo, holoMat);
-            chest.scale.set(1.3, 1, 0.7);
-            chest.position.set(0, 95, 5);
-            robotGroup.add(chest);
+            // Keep names compatible for the animation timeline references, even if unused
+            head = { rotation: { x: 0, y: 0, z: 0 } };
+            shoulderL = { rotation: { x: 0, y: 0, z: 0 } };
+            elbowL = { rotation: { x: 0, y: 0, z: 0 } };
+            handL = { rotation: { x: 0, y: 0, z: 0 } };
+            shoulderR = { rotation: { x: 0, y: 0, z: 0 } };
+            elbowR = { rotation: { x: 0, y: 0, z: 0 } };
+            handR = { rotation: { x: 0, y: 0, z: 0 } };
 
-            const absGeo = new THREE.CylinderGeometry(25, 20, 45, 32);
-            const abs = new THREE.Mesh(absGeo, holoMat);
-            abs.position.set(0, 45, 5);
-            robotGroup.add(abs);
-
-            head = new THREE.Group();
-            head.position.set(0, 145, 0);
-
-            const skullGeo = new THREE.SphereGeometry(22, 32, 32);
-            const skull = new THREE.Mesh(skullGeo, holoMat);
-            skull.scale.set(1, 1.15, 1.1);
-            head.add(skull);
-
-            const jawGeo = new THREE.CylinderGeometry(14, 9, 15, 32);
-            const jaw = new THREE.Mesh(jawGeo, holoMat);
-            jaw.position.set(0, -14, 6);
-            jaw.scale.set(1, 1, 1.2);
-            head.add(jaw);
-
-            const noseGeo = new THREE.ConeGeometry(2, 8, 16);
-            const nose = new THREE.Mesh(noseGeo, holoMat);
-            nose.position.set(0, -5, 23.5);
-            nose.rotation.x = Math.PI / 8;
-            head.add(nose);
-
-            const eyeGeo = new THREE.SphereGeometry(2.5, 16, 16);
-            const eyeR = new THREE.Mesh(eyeGeo, glowEyeMat);
-            eyeR.position.set(8, 0, 21.5);
-            eyeR.scale.set(1.5, 0.6, 0.5);
-
-            const eyeL = new THREE.Mesh(eyeGeo, glowEyeMat);
-            eyeL.position.set(-8, 0, 21.5);
-            eyeL.scale.set(1.5, 0.6, 0.5);
-
-            head.add(eyeR);
-            head.add(eyeL);
-
-            robotGroup.add(head);
-
-            shoulderL = new THREE.Group();
-            shoulderL.position.set(-48, 110, 0);
-            robotGroup.add(shoulderL);
-            createArm(shoulderL, elbowL, handL, false);
-
-            shoulderR = new THREE.Group();
-            shoulderR.position.set(48, 110, 0);
-            robotGroup.add(shoulderR);
-            createArm(shoulderR, elbowR, handR, true);
+            robotGroup.add(robotSprite);
 
             robotGroup.scale.set(10, 10, 10);
-            robotGroup.position.set(0, -1000, -900);
+            robotGroup.position.set(0, -1000, -900); // Wait in the depths
 
             scene.add(robotGroup);
-        }
-
-        function createArm(shoulder: any, elbow: any, hand: any, isRight: boolean) {
-            const shoulderJoint = new THREE.Mesh(new THREE.SphereGeometry(14, 32, 32), holoMat);
-            shoulder.add(shoulderJoint);
-
-            const shoulderArmor = new THREE.Mesh(new THREE.SphereGeometry(18, 32, 32), holoMat);
-            shoulderArmor.scale.set(1.2, 1, 1);
-            shoulder.add(shoulderArmor);
-
-            const upperArmGroup = new THREE.Group();
-            shoulder.add(upperArmGroup);
-
-            const upperArmMesh = new THREE.Mesh(new THREE.CylinderGeometry(11, 9, 80, 32), holoMat);
-            upperArmMesh.position.y = -40;
-            upperArmGroup.add(upperArmMesh);
-
-            elbow = new THREE.Group();
-            elbow.position.set(0, -80, 0);
-            upperArmGroup.add(elbow);
-
-            elbow.add(new THREE.Mesh(new THREE.SphereGeometry(11, 32, 32), holoMat));
-
-            const lowerArmMesh = new THREE.Mesh(new THREE.CylinderGeometry(9, 7, 80, 32), holoMat);
-            lowerArmMesh.position.y = -40;
-            elbow.add(lowerArmMesh);
-
-            const handGeo = new THREE.SphereGeometry(10, 32, 32);
-            hand = new THREE.Mesh(handGeo, holoMat);
-            hand.scale.set(1, 1.5, 0.5);
-            hand.position.y = -85;
-            if (isRight) {
-                handR = hand;
-                elbowR = elbow;
-            } else {
-                handL = hand;
-                elbowL = elbow;
-            }
-            elbow.add(hand);
         }
 
         function startBigBangAnimation() {
@@ -436,6 +350,7 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             if (robotGroup) {
                 const time = Date.now() * 0.0005;
+                // Make the robot levitate slowly, but do not rotate it
                 robotGroup.position.y = -1000 + Math.sin(time) * 15;
             }
 
@@ -520,14 +435,14 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showButton ? 1 : 0 }}
                 transition={{ duration: 1 }}
-                className="absolute bottom-6 right-6 z-20"
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20"
             >
                 <button
                     onClick={onComplete}
-                    className="group inline-flex items-center justify-center rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 py-3 text-xs sm:text-sm font-mono font-medium text-brand-muted transition-all duration-300 hover:text-brand-text hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-wide cursor-pointer"
+                    className="group inline-flex items-center justify-center rounded-sm bg-brand-neon px-8 py-4 text-sm font-mono font-bold text-brand-dark shadow-[0_0_20px_rgba(42,245,152,0.3)] transition-all duration-300 hover:bg-[#1ee087] hover:scale-105 hover:shadow-[0_0_30px_rgba(42,245,152,0.5)] uppercase tracking-widest cursor-pointer"
                 >
-                    Acessar a LP
-                    <ChevronRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                    Acessar a Nova Realidade
+                    <ChevronRight className="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
             </motion.div>
         </div>
