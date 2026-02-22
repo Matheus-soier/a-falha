@@ -44,7 +44,7 @@ const SocialProofSection: React.FC = () => {
                         </div>
 
                         {/* Matrix Hands Animation (Split Images for Offering Effect) */}
-                        <div className="relative z-10 w-full max-w-[800px] h-[350px] md:h-[450px] mt-6 mb-8 mx-auto flex justify-center items-center">
+                        <div className="relative z-10 w-full max-w-[1000px] h-[450px] md:h-[550px] mt-6 mb-8 mx-auto flex justify-center items-center">
                             {/* Left Hand (Blue Pill) */}
                             <motion.div
                                 className="w-1/2 h-full relative"
