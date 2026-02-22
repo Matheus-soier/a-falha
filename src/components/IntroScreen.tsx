@@ -239,8 +239,12 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             robotGroup.add(robotSprite);
 
-            robotGroup.scale.set(10, 10, 10);
-            robotGroup.position.set(0, -1000, -900); // Wait in the depths
+            // Scale matches previous visual weight, but we bring Z forward
+            robotGroup.scale.set(4, 4, 1);
+
+            // Earth is at Z=0. The camera is at Z=450.
+            // We place the robot at Z=120 so it sits in front of the Earth
+            robotGroup.position.set(0, -1000, 120);
 
             scene.add(robotGroup);
         }
@@ -435,14 +439,15 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showButton ? 1 : 0 }}
                 transition={{ duration: 1 }}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20"
+                className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto"
             >
                 <button
                     onClick={onComplete}
-                    className="group inline-flex items-center justify-center rounded-sm bg-brand-neon px-8 py-4 text-sm font-mono font-bold text-brand-dark shadow-[0_0_20px_rgba(42,245,152,0.3)] transition-all duration-300 hover:bg-[#1ee087] hover:scale-105 hover:shadow-[0_0_30px_rgba(42,245,152,0.5)] uppercase tracking-widest cursor-pointer"
+                    className="group flex items-center justify-center w-full md:w-auto mx-auto rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-mono font-bold text-brand-muted hover:text-brand-neon shadow-lg transition-all duration-300 hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-widest cursor-pointer"
                 >
-                    Acessar a Nova Realidade
-                    <ChevronRight className="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="md:hidden">Acessar</span>
+                    <span className="hidden md:inline">Acessar a Nova Realidade</span>
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
             </motion.div>
         </div>
