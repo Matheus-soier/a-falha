@@ -184,22 +184,32 @@ const PricingSection: React.FC = () => {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.1),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col items-center h-full">
-                            {/* Graphic */}
-                            <motion.div
-                                animate={{ y: [-10, 10, -10], rotateY: [0, 360] }}
-                                transition={{
-                                    y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-                                    rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
-                                }}
-                                style={{ transformStyle: "preserve-3d" }}
-                                className="mb-6 flex justify-center cursor-pointer"
+                            {/* Graphic 3D CSS Pill */}
+                            <div
+                                className="mb-[60px] mt-[30px] flex justify-center cursor-pointer perspective-[1000px] h-32 w-16"
                                 onClick={() => openModal('blue')}
                             >
-                                <div className="w-16 h-32 rounded-full relative overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_30px_rgba(59,130,246,0.5)] bg-gradient-to-b from-blue-500 to-blue-900 group-hover:shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_50px_rgba(59,130,246,0.8)] transition-all duration-500">
-                                    <div className="absolute top-[5px] left-[10px] w-[15px] h-[80px] bg-gradient-to-b from-white/80 to-transparent rounded-[10px] -rotate-12 blur-[1px] z-10" />
-                                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-black/30 -translate-y-1/2 z-10" />
-                                </div>
-                            </motion.div>
+                                <motion.div
+                                    animate={{ 
+                                        y: [-10, 10, -10],
+                                        rotateX: [-15, 15, -15],
+                                        rotateY: [0, 360] 
+                                    }}
+                                    transition={{ 
+                                        y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                                        rotateX: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
+                                        rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
+                                    }}
+                                    className="relative w-full h-full"
+                                    style={{ transformStyle: "preserve-3d" }}
+                                >
+                                    <Css3DPill
+                                        colorMain="#3B82F6" 
+                                        colorShadow="#1E3A8A" 
+                                        glowColor="rgba(59,130,246,0.5)"
+                                    />
+                                </motion.div>
+                            </div>
 
                             <h3 className="text-3xl font-heading font-extrabold text-blue-400 mb-2 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">A Pílula Azul</h3>
                             <p className="text-sm font-mono text-blue-100/50 mb-6 uppercase tracking-widest text-center">Ficar no País das Maravilhas</p>
@@ -245,22 +255,32 @@ const PricingSection: React.FC = () => {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.1),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col items-center h-full">
-                            {/* Graphic */}
-                            <motion.div
-                                animate={{ y: [-10, 10, -10], rotateY: [0, -360] }}
-                                transition={{
-                                    y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
-                                    rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
-                                }}
-                                style={{ transformStyle: "preserve-3d" }}
-                                className="mb-6 flex justify-center cursor-pointer"
+                            {/* Graphic 3D CSS Pill */}
+                            <div
+                                className="mb-[60px] mt-[30px] flex justify-center cursor-pointer perspective-[1000px] h-32 w-16"
                                 onClick={() => openModal('red')}
                             >
-                                <div className="w-16 h-32 rounded-full relative overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_40px_rgba(239,68,68,0.7)] bg-gradient-to-b from-red-600 to-red-950 group-hover:shadow-[inset_0_0_20px_rgba(0,0,0,0.6),0_0_60px_rgba(239,68,68,0.9)] transition-all duration-500">
-                                    <div className="absolute top-[5px] left-[10px] w-[15px] h-[80px] bg-gradient-to-b from-white/80 to-transparent rounded-[10px] -rotate-12 blur-[1px] z-10" />
-                                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-black/40 -translate-y-1/2 z-10" />
-                                </div>
-                            </motion.div>
+                                <motion.div
+                                    animate={{ 
+                                        y: [-10, 10, -10],
+                                        rotateX: [-15, 15, -15],
+                                        rotateY: [0, -360] 
+                                    }}
+                                    transition={{ 
+                                        y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+                                        rotateX: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
+                                        rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
+                                    }}
+                                    className="relative w-full h-full"
+                                    style={{ transformStyle: "preserve-3d" }}
+                                >
+                                    <Css3DPill
+                                        colorMain="#EF4444" 
+                                        colorShadow="#7F1D1D" 
+                                        glowColor="rgba(239,68,68,0.5)"
+                                    />
+                                </motion.div>
+                            </div>
 
                             <h3 className="text-3xl font-heading font-extrabold text-red-500 mb-2 tracking-tight drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">A Pílula Vermelha</h3>
                             <p className="text-sm font-mono text-red-500 mb-6 uppercase tracking-widest text-center">Acesso Root ao &lt;Kernel/&gt;</p>
