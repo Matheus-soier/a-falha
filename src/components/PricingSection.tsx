@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Css3DPill } from './Css3DPill';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, ArrowRight, Loader2, X } from 'lucide-react';
 
@@ -190,12 +191,12 @@ const PricingSection: React.FC = () => {
                                 onClick={() => openModal('blue')}
                             >
                                 <motion.div
-                                    animate={{ 
+                                    animate={{
                                         y: [-10, 10, -10],
                                         rotateX: [-15, 15, -15],
-                                        rotateY: [0, 360] 
+                                        rotateY: [0, 360]
                                     }}
-                                    transition={{ 
+                                    transition={{
                                         y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
                                         rotateX: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
                                         rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
@@ -204,8 +205,8 @@ const PricingSection: React.FC = () => {
                                     style={{ transformStyle: "preserve-3d" }}
                                 >
                                     <Css3DPill
-                                        colorMain="#3B82F6" 
-                                        colorShadow="#1E3A8A" 
+                                        colorMain="#3B82F6"
+                                        colorShadow="#1E3A8A"
                                         glowColor="rgba(59,130,246,0.5)"
                                     />
                                 </motion.div>
@@ -261,12 +262,12 @@ const PricingSection: React.FC = () => {
                                 onClick={() => openModal('red')}
                             >
                                 <motion.div
-                                    animate={{ 
+                                    animate={{
                                         y: [-10, 10, -10],
                                         rotateX: [-15, 15, -15],
-                                        rotateY: [0, -360] 
+                                        rotateY: [0, -360]
                                     }}
-                                    transition={{ 
+                                    transition={{
                                         y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
                                         rotateX: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
                                         rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
@@ -275,8 +276,8 @@ const PricingSection: React.FC = () => {
                                     style={{ transformStyle: "preserve-3d" }}
                                 >
                                     <Css3DPill
-                                        colorMain="#EF4444" 
-                                        colorShadow="#7F1D1D" 
+                                        colorMain="#EF4444"
+                                        colorShadow="#7F1D1D"
                                         glowColor="rgba(239,68,68,0.5)"
                                     />
                                 </motion.div>
