@@ -218,12 +218,12 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
                 transparent: true,
                 opacity: 0,
                 depthWrite: false,
-                blending: THREE.AdditiveBlending // gives it a magical/holographic summon feel initially
+                blending: THREE.NormalBlending // Normal blending for the photorealistic image
             });
 
             const robotSprite = new THREE.Sprite(spriteMaterial);
-            // Size it similarly to the previous geometry
-            robotSprite.scale.set(60, 60, 1);
+            // Big size so it towers behind the Earth (Earth radius is 100)
+            robotSprite.scale.set(450, 450, 1);
 
             holoMat = spriteMaterial; // Reuse the variable so the GSAP animation timeline still controls opacity
             glowEyeMat = { opacity: 0 }; // Mock object since we don't have separate eyes anymore to animate
@@ -239,12 +239,9 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             robotGroup.add(robotSprite);
 
-            // Scale matches previous visual weight, but we bring Z forward
-            robotGroup.scale.set(4, 4, 1);
-
-            // Earth is at Z=0. The camera is at Z=450.
-            // We place the robot at Z=120 so it sits in front of the Earth
-            robotGroup.position.set(0, -1000, 120);
+            // We place the robot towering behind the Earth
+            robotGroup.scale.set(1, 1, 1);
+            robotGroup.position.set(0, 120, -150);
 
             scene.add(robotGroup);
         }
@@ -304,7 +301,8 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             const robTl = gsap.timeline({ delay: 9.0 });
 
-            robTl.to(holoMat, { opacity: 0.35, duration: 4.0, ease: "power2.inOut" }, 0);
+            // Animate opacity to 1.0 (fully visible)
+            robTl.to(holoMat, { opacity: 1.0, duration: 4.0, ease: "power2.inOut" }, 0);
             robTl.to(glowEyeMat, { opacity: 0.8, duration: 4.0, ease: "power2.inOut" }, 0);
             robTl.to(godLight, { intensity: 1.5, duration: 4.0 }, 0);
 
@@ -336,6 +334,7 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             robTl.to(head.rotation, { x: 0, duration: retractDuration, ease: armEase }, 8.0);
 
+            // Fade out the robot at the end
             robTl.to(holoMat, { opacity: 0, duration: 3.5, ease: "power2.inOut" }, 10.0);
             robTl.to(glowEyeMat, { opacity: 0, duration: 3.5, ease: "power2.inOut" }, 10.0);
             robTl.to(godLight, { intensity: 0, duration: 3.5 }, 10.0);
@@ -354,8 +353,8 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             if (robotGroup) {
                 const time = Date.now() * 0.0005;
-                // Make the robot levitate slowly, but do not rotate it
-                robotGroup.position.y = -1000 + Math.sin(time) * 15;
+                // Make the robot levitate slowly right behind the earth
+                robotGroup.position.y = 120 + Math.sin(time) * 15;
             }
 
             controls.update();
