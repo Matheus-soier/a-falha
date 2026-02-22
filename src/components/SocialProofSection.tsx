@@ -135,17 +135,9 @@ const SocialProofSection: React.FC = () => {
                                 <path d="M 165 145 Q 160 160 155 170" fill="none" stroke="rgba(42,245,152,0.6)" strokeWidth="1" strokeLinecap="round" />
 
                                 {/* --- Mouth Cavity & Lips --- */}
-                                {/* Background of Mouth Hole */}
-                                <path
-                                    d="M 60 170 Q 100 240 140 170 Q 140 230 100 250 Q 60 230 60 170 Z"
-                                    fill="#000000"
-                                    stroke="rgba(42,245,152,0.2)"
-                                    strokeWidth="2"
-                                />
-
                                 {/* Animated Lips - Matrix Style */}
                                 <motion.path
-                                    fill="transparent"
+                                    fill="#000000"
                                     stroke="#2AF598"
                                     strokeWidth="2.5"
                                     filter="url(#neon-glow)"
@@ -180,13 +172,6 @@ const SocialProofSection: React.FC = () => {
                                         times: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1],
                                         ease: "easeInOut"
                                     }}
-                                />
-
-                                {/* Deep Throat (Keyhole) inside the mouth */}
-                                <path
-                                    d="M 90 205 Q 100 190 110 205 L 115 220 C 115 230 85 230 85 220 Z"
-                                    fill="#2AF598"
-                                    opacity="0.1"
                                 />
 
                                 {/* --- The Big Knob (The Nose) --- */}
