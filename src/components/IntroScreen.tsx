@@ -42,15 +42,15 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             iResolution: { value: new THREE.Vector3(1, 1, 1) },
         };
 
-        const vertexShader = \`
+        const vertexShader = `
         varying vec2 vUv;
         void main() {
             vUv = uv;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
-        \`;
+        `;
 
-        const fragmentShader = \`
+        const fragmentShader = `
         precision highp float;
 
         uniform float iTime;
@@ -72,7 +72,7 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             mainImage(color, fragCoord);
             gl_FragColor = color;
         }
-        \`;
+        `;
 
         const material = new THREE.ShaderMaterial({
             uniforms,
@@ -117,34 +117,34 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
         };
     }, []);
 
-return (
-    <div className="fixed inset-0 z-[100] bg-[#050505] font-body overflow-hidden">
+    return (
+        <div className="fixed inset-0 z-[100] bg-[#050505] font-body overflow-hidden">
 
 
-        <div ref={containerRef} className="absolute inset-0 z-0" />
+            <div ref={containerRef} className="absolute inset-0 z-0" />
 
-        <div ref={textRef} className="cyber-text-overlay">
-            A <span className="flicker-1">F</span>A<span className="flicker-2">L</span><span className="flicker-3">H</span>A
-        </div>
+            <div ref={textRef} className="cyber-text-overlay">
+                A <span className="flicker-1">F</span>A<span className="flicker-2">L</span><span className="flicker-3">H</span>A
+            </div>
 
-        {/* Skip / Enter Button */}
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showButton ? 1 : 0 }}
-            transition={{ duration: 1 }}
-            className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto"
-        >
-            <button
-                onClick={onComplete}
-                className="group flex items-center justify-center w-full md:w-auto mx-auto rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-mono font-bold text-brand-muted hover:text-brand-neon shadow-lg transition-all duration-300 hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-widest cursor-pointer"
+            {/* Skip / Enter Button */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: showButton ? 1 : 0 }}
+                transition={{ duration: 1 }}
+                className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto"
             >
-                <span className="md:hidden">Acessar</span>
-                <span className="hidden md:inline">Acessar a Nova Realidade</span>
-                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
-        </motion.div>
-    </div>
-);
+                <button
+                    onClick={onComplete}
+                    className="group flex items-center justify-center w-full md:w-auto mx-auto rounded-sm bg-brand-surface1 border border-brand-surface2 px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-mono font-bold text-brand-muted hover:text-brand-neon shadow-lg transition-all duration-300 hover:border-brand-neon hover:bg-brand-surface2 uppercase tracking-widest cursor-pointer"
+                >
+                    <span className="md:hidden">Acessar</span>
+                    <span className="hidden md:inline">Acessar a Nova Realidade</span>
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                </button>
+            </motion.div>
+        </div>
+    );
 };
 
 export default IntroScreen;
