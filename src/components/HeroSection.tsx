@@ -8,11 +8,11 @@ const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
 
     useEffect(() => {
         const glitchInterval = setInterval(() => {
-            // Random chance to trigger a glitch (e.g. 30% chance every 1.5s)
-            if (Math.random() > 0.3) return;
+            // Increased chance: 70% chance to glitch every 800ms
+            if (Math.random() > 0.7) return;
 
-            // Pick 1 or 2 random indexes to glitch
-            const numGlitches = Math.random() > 0.8 ? 2 : 1;
+            // Pick 1 to 4 random indexes to glitch to make it more noticeable
+            const numGlitches = Math.floor(Math.random() * 4) + 1; // 1 to 4 characters
             const originalChars = text.split('');
             const glitchIndexes: number[] = [];
 
@@ -32,12 +32,12 @@ const ScrambleText: React.FC<{ text: string }> = ({ text }) => {
             });
             setDisplayText(glitchedChars.join(''));
 
-            // Revert back quickly (e.g., 50ms - 150ms)
+            // Revert back slightly slower so the eye can catch it (100ms - 250ms)
             setTimeout(() => {
                 setDisplayText(text);
-            }, 50 + Math.random() * 100);
+            }, 100 + Math.random() * 150);
 
-        }, 1500); // Check every 1.5s if a glitch should happen
+        }, 800); // Check more frequently (every 800ms)
 
         return () => clearInterval(glitchInterval);
     }, [text]);
