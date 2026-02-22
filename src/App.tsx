@@ -22,6 +22,7 @@ import Contato from './pages/Contato';
 function App() {
   const [currentHash, setCurrentHash] = useState(window.location.hash);
   const [showIntro, setShowIntro] = useState(true);
+  const [hasStartedAudio, setHasStartedAudio] = useState(false);
 
   useEffect(() => {
     // Initialize dataLayer
@@ -41,6 +42,20 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  useEffect(() => {
+    // Attempt to play audio when user leaves the intro screen
+    if (!showIntro && !hasStartedAudio) {
+      const audio = document.getElementById('bg-music') as HTMLAudioElement;
+      if (audio) {
+        audio.volume = 0.5; // Set volume to 50%
+        audio.play().catch((err) => {
+          console.warn("Autoplay blocked or audio missing: ", err);
+        });
+        setHasStartedAudio(true);
+      }
+    }
+  }, [showIntro, hasStartedAudio]);
+
   // Simple Hash Router Config
   if (currentHash === '#termos') return <TermosDeUso />;
   if (currentHash === '#privacidade') return <PoliticaDePrivacidade />;
@@ -55,6 +70,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-brand-dark text-brand-text selection:bg-brand-neon/30 selection:text-white relative">
+      <audio id="bg-music" src="/trilha.mp3" loop />
       <HeroSection />
       <StacksWaveSection />
       <ProblemSection />
