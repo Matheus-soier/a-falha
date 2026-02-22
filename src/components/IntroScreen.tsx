@@ -210,40 +210,205 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
         function createRobot() {
             robotGroup = new THREE.Group();
 
-            const textureLoader = new THREE.TextureLoader();
-            const robotTexture = textureLoader.load('/realistic_dark_robot.png');
-
-            const spriteMaterial = new THREE.SpriteMaterial({
-                map: robotTexture,
+            holoMat = new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                metalness: 0.9,
+                roughness: 0.2,
                 transparent: true,
                 opacity: 0,
-                depthWrite: false,
-                blending: THREE.NormalBlending // Normal blending for the photorealistic image
+                side: THREE.DoubleSide
             });
 
-            const robotSprite = new THREE.Sprite(spriteMaterial);
-            // Big size so it towers behind the Earth (Earth radius is 100)
-            robotSprite.scale.set(450, 450, 1);
+            glowEyeMat = new THREE.MeshBasicMaterial({
+                color: 0x1EE087,
+                transparent: true,
+                opacity: 0
+            });
 
-            holoMat = spriteMaterial; // Reuse the variable so the GSAP animation timeline still controls opacity
-            glowEyeMat = { opacity: 0 }; // Mock object since we don't have separate eyes anymore to animate
+            // --- SPINE ---
+            const spineGroup = new THREE.Group();
+            const spineGeo = new THREE.CylinderGeometry(8, 12, 140, 8);
+            const spine = new THREE.Mesh(spineGeo, holoMat);
+            spineGroup.add(spine);
 
-            // Keep names compatible for the animation timeline references, even if unused
-            head = { rotation: { x: 0, y: 0, z: 0 } };
-            shoulderL = { rotation: { x: 0, y: 0, z: 0 } };
-            elbowL = { rotation: { x: 0, y: 0, z: 0 } };
-            handL = { rotation: { x: 0, y: 0, z: 0 } };
-            shoulderR = { rotation: { x: 0, y: 0, z: 0 } };
-            elbowR = { rotation: { x: 0, y: 0, z: 0 } };
-            handR = { rotation: { x: 0, y: 0, z: 0 } };
+            // Spinal rings
+            for (let i = 0; i < 5; i++) {
+                const ringGeo = new THREE.TorusGeometry(18, 3, 8, 16);
+                const ring = new THREE.Mesh(ringGeo, holoMat);
+                ring.position.y = -40 + i * 20;
+                ring.rotation.x = Math.PI / 2;
+                spineGroup.add(ring);
+            }
+            spineGroup.position.y = 60;
+            robotGroup.add(spineGroup);
 
-            robotGroup.add(robotSprite);
+            // --- CHEST ---
+            const chestGroup = new THREE.Group();
+            chestGroup.position.set(0, 100, 5);
 
-            // We place the robot towering behind the Earth
-            robotGroup.scale.set(1, 1, 1);
-            robotGroup.position.set(0, 120, -150);
+            // Main thorax
+            const chestGeo = new THREE.BoxGeometry(60, 50, 40);
+            const chest = new THREE.Mesh(chestGeo, holoMat);
+            chestGroup.add(chest);
+
+            // Chest Armor Plates
+            const plateGeo = new THREE.BoxGeometry(70, 20, 45);
+            const plate1 = new THREE.Mesh(plateGeo, holoMat);
+            plate1.position.set(0, 15, 0);
+            plate1.rotation.x = -0.1;
+            chestGroup.add(plate1);
+
+            const plate2 = new THREE.Mesh(plateGeo, holoMat);
+            plate2.position.set(0, -10, 5);
+            plate2.rotation.x = 0.1;
+            chestGroup.add(plate2);
+
+            // Glowing Core
+            const coreGeo = new THREE.CylinderGeometry(15, 15, 46, 16);
+            const coreMesh = new THREE.Mesh(coreGeo, glowEyeMat);
+            coreMesh.rotation.x = Math.PI / 2;
+            coreMesh.position.set(0, 0, 5);
+            chestGroup.add(coreMesh);
+
+            robotGroup.add(chestGroup);
+
+            // --- ABDOMEN ---
+            const absGeo = new THREE.CylinderGeometry(20, 15, 50, 8);
+            const abs = new THREE.Mesh(absGeo, holoMat);
+            abs.position.set(0, 45, 5);
+            robotGroup.add(abs);
+
+            // --- HEAD ---
+            head = new THREE.Group();
+            head.position.set(0, 150, 5);
+
+            // Base skull
+            const skullGeo = new THREE.BoxGeometry(26, 32, 30);
+            const skull = new THREE.Mesh(skullGeo, holoMat);
+            head.add(skull);
+
+            // Crown / Helmet top
+            const crownGeo = new THREE.BoxGeometry(30, 10, 32);
+            const crown = new THREE.Mesh(crownGeo, holoMat);
+            crown.position.set(0, 16, -2);
+            head.add(crown);
+
+            // Jaw
+            const jawGeo = new THREE.BoxGeometry(28, 12, 15);
+            const jaw = new THREE.Mesh(jawGeo, holoMat);
+            jaw.position.set(0, -14, 10);
+            head.add(jaw);
+
+            // Side Antennae / Ears
+            const earGeo = new THREE.CylinderGeometry(5, 5, 34, 16);
+            const earR = new THREE.Mesh(earGeo, holoMat);
+            earR.rotation.x = Math.PI / 2;
+            earR.position.set(15, 0, 0);
+            head.add(earR);
+            const earL = new THREE.Mesh(earGeo, holoMat);
+            earL.rotation.x = Math.PI / 2;
+            earL.position.set(-15, 0, 0);
+            head.add(earL);
+
+            // Visor (Glowing Eyes)
+            const visorGeo = new THREE.BoxGeometry(22, 6, 2);
+            const visor = new THREE.Mesh(visorGeo, glowEyeMat);
+            visor.position.set(0, 4, 16);
+            head.add(visor);
+
+            // Mean eyebrows / angled armor over visor
+            const browGeo = new THREE.BoxGeometry(24, 8, 4);
+            const brow = new THREE.Mesh(browGeo, holoMat);
+            brow.position.set(0, 10, 16);
+            brow.rotation.x = 0.2;
+            head.add(brow);
+
+            robotGroup.add(head);
+
+            // --- SHOULDERS & ARMS ---
+            shoulderL = new THREE.Group();
+            shoulderL.position.set(-55, 120, 0);
+            robotGroup.add(shoulderL);
+            createArm(shoulderL, false);
+
+            shoulderR = new THREE.Group();
+            shoulderR.position.set(55, 120, 0);
+            robotGroup.add(shoulderR);
+            createArm(shoulderR, true);
+
+            robotGroup.scale.set(6, 6, 6);
+            robotGroup.position.set(0, -650, -150);
 
             scene.add(robotGroup);
+        }
+
+        function createArm(shoulderGroup: any, isRight: boolean) {
+            // Massive Pauldron (Shoulder Armor)
+            const pauldronGroup = new THREE.Group();
+            const pauldronGeo1 = new THREE.BoxGeometry(35, 30, 40);
+            const p1 = new THREE.Mesh(pauldronGeo1, holoMat);
+            pauldronGroup.add(p1);
+
+            const pauldronGeo2 = new THREE.BoxGeometry(40, 20, 45);
+            const p2 = new THREE.Mesh(pauldronGeo2, holoMat);
+            p2.position.set(isRight ? 5 : -5, 10, 0);
+            p2.rotation.z = isRight ? -0.2 : 0.2;
+            pauldronGroup.add(p2);
+
+            shoulderGroup.add(pauldronGroup);
+
+            // Upper Arm
+            const upperArmGroup = new THREE.Group();
+            shoulderGroup.add(upperArmGroup);
+
+            const upperArmGeo = new THREE.CylinderGeometry(12, 10, 60, 8);
+            const upperArmMesh = new THREE.Mesh(upperArmGeo, holoMat);
+            upperArmMesh.position.y = -40;
+            upperArmGroup.add(upperArmMesh);
+
+            // Elbow Joint
+            const elbowGroup = new THREE.Group();
+            elbowGroup.position.set(0, -70, 0);
+            upperArmGroup.add(elbowGroup);
+
+            const elbowJointGeo = new THREE.SphereGeometry(14, 16, 16);
+            const elbowJoint = new THREE.Mesh(elbowJointGeo, holoMat);
+            elbowGroup.add(elbowJoint);
+
+            // Lower Arm / Forearm
+            const lowerArmGeo = new THREE.CylinderGeometry(10, 14, 60, 8);
+            const lowerArmMesh = new THREE.Mesh(lowerArmGeo, holoMat);
+            lowerArmMesh.position.y = -35;
+            elbowGroup.add(lowerArmMesh);
+
+            // Forearm armor / blade
+            const bladeGeo = new THREE.BoxGeometry(8, 50, 20);
+            const blade = new THREE.Mesh(bladeGeo, holoMat);
+            blade.position.set(isRight ? 10 : -10, -35, 5);
+            elbowGroup.add(blade);
+
+            // Hand / Claws
+            const handGeo = new THREE.BoxGeometry(16, 20, 16);
+            const handMesh = new THREE.Mesh(handGeo, holoMat);
+            handMesh.position.y = -75;
+
+            // Claws
+            const clawGeo = new THREE.CylinderGeometry(2, 0.5, 25, 4);
+            for (let i = 0; i < 3; i++) {
+                const claw = new THREE.Mesh(clawGeo, holoMat);
+                claw.position.set((i - 1) * 6, -15, 6);
+                claw.rotation.x = -0.2;
+                handMesh.add(claw);
+            }
+
+            if (isRight) {
+                handR = handMesh;
+                elbowR = elbowGroup;
+            } else {
+                handL = handMesh;
+                elbowL = elbowGroup;
+            }
+            elbowGroup.add(handMesh);
         }
 
         function startBigBangAnimation() {
@@ -353,8 +518,8 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
             if (robotGroup) {
                 const time = Date.now() * 0.0005;
-                // Make the robot levitate slowly right behind the earth
-                robotGroup.position.y = 120 + Math.sin(time) * 15;
+                // Make the robot levitate tall behind the earth
+                robotGroup.position.y = -650 + Math.sin(time) * 15;
             }
 
             controls.update();
