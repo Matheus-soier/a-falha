@@ -43,107 +43,97 @@ const SocialProofSection: React.FC = () => {
                             [USER_IDENTIFICATION_PENDING]
                         </div>
 
-                        {/* Coded Silhouette (3D Mirror Animation) */}
-                        <motion.div
-                            className="relative z-10 flex flex-col items-center mt-10 mb-8"
-                            animate={{ opacity: [0.8, 1, 0.8] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        >
-                            <div className="relative w-48 h-60 flex justify-center [perspective:1000px]">
-                                {/* SVG Definition for Unified Clip Path */}
-                                <svg width="0" height="0" className="absolute">
-                                    <defs>
-                                        <clipPath id="unified-silhouette">
-                                            {/* Matches the 100x100 viewBox of the wrapper, scaled to object bounds via CSS if needed, but here we just map it 1:1 if we use absolute positioning or a proper wrapper */}
-                                        </clipPath>
-                                    </defs>
-                                </svg>
+                        {/* Talking Doorknob Animation */}
+                        <div className="relative z-10 flex flex-col items-center mt-10 mb-8 w-full max-w-[200px] h-64 justify-center">
+                            <motion.svg
+                                viewBox="0 0 120 180"
+                                className="w-full h-full drop-shadow-[0_0_15px_rgba(42,245,152,0.3)]"
+                                initial={{ y: 0 }}
+                                animate={{ y: [-3, 3, -3] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                {/* Backplate: Gold/Brass with dark aesthetic */}
+                                <path
+                                    d="M 20 20 Q 60 -10 100 20 L 105 160 Q 60 190 15 160 Z"
+                                    fill="#111718"
+                                    stroke="url(#brass-grad)"
+                                    strokeWidth="3"
+                                />
 
-                                <motion.div
-                                    className="w-full h-full relative will-change-transform"
+                                {/* Eyebrows */}
+                                <path d="M 35 45 Q 45 35 55 45" fill="none" stroke="#2AF598" strokeWidth="2.5" strokeLinecap="round" />
+                                <path d="M 85 45 Q 75 35 65 45" fill="none" stroke="#2AF598" strokeWidth="2.5" strokeLinecap="round" />
+
+                                {/* Eyes */}
+                                <ellipse cx="45" cy="55" rx="5" ry="8" fill="#111718" stroke="#2AF598" strokeWidth="1.5" />
+                                <ellipse cx="75" cy="55" rx="5" ry="8" fill="#111718" stroke="#2AF598" strokeWidth="1.5" />
+                                {/* Pupils */}
+                                <circle cx="45" cy="57" r="2.5" fill="#2AF598" />
+                                <circle cx="75" cy="57" r="2.5" fill="#2AF598" />
+
+                                {/* Mouth Hole - Animates up and down */}
+                                <motion.path
+                                    d="M 40 120 C 40 120, 60 120, 80 120 C 75 160, 45 160, 40 120 Z"
+                                    fill="#050505"
+                                    stroke="#2AF598"
+                                    strokeWidth="1.5"
                                     animate={{
-                                        rotateY: [-12, 12, -12],
-                                        rotateX: [2, -2, 2],
-                                        y: [-8, 8, -8]
+                                        d: [
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z", // Closed
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 145, 45 145, 40 120 Z", // "Vo"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 130, 45 130, 40 120 Z", // "ce?"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z", // Pause
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 135, 45 135, 40 120 Z", // "Tal"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 140, 45 140, 40 120 Z", // "vez"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z", // Pause
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 135, 45 135, 40 120 Z", // "de"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 145, 45 145, 40 120 Z", // "pen"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 135, 45 135, 40 120 Z", // "de"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z", // Pause
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 140, 45 140, 40 120 Z", // "da de"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 150, 45 150, 40 120 Z", // "ci"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 130, 45 130, 40 120 Z", // "são"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z", // Pause
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 135, 45 135, 40 120 Z", // "que"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 140, 45 140, 40 120 Z", // "vai"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 155, 45 155, 40 120 Z", // "to"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 130, 45 130, 40 120 Z", // "mar"
+                                            "M 40 120 C 40 120, 60 120, 80 120 C 75 125, 45 125, 40 120 Z"  // Closed
+                                        ]
                                     }}
                                     transition={{
-                                        rotateY: { duration: 7, repeat: Infinity, ease: "easeInOut" },
-                                        rotateX: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-                                        y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                                        duration: 6,
+                                        repeat: Infinity,
+                                        times: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1],
+                                        ease: "easeInOut"
                                     }}
-                                    style={{ transformStyle: "preserve-3d" }}
-                                >
-                                    {/* The Mask Layer using inline SVG clip path for pixel perfection */}
-                                    <div className="absolute inset-0 z-10" style={{ clipPath: 'url(#keyhole-mask)' }}>
-                                        <svg width="0" height="0" className="absolute">
-                                            <defs>
-                                                {/* Use exactly the same path, but scaled for a 192x240 container (w-48 h-60). 
-                                                    Or better, use clipPathUnits="objectBoundingBox" with perfectly matching math 
-                                                    Math for path: 
-                                                    Circle Center: 50, 25. Radius: 25. (0.5, 0.25, R=0.25)
-                                                    Line to bottom corners: 10,90 and 90,90. 
-                                                */}
-                                                <clipPath id="keyhole-mask" clipPathUnits="objectBoundingBox">
-                                                    <path d="M 0.5 0.1 A 0.25 0.25 0 1 1 0.3 0.25 C 0.3 0.5, 0.2 0.8, 0.1 0.9 L 0.9 0.9 C 0.8 0.8, 0.7 0.5, 0.7 0.25 A 0.25 0.25 0 1 1 0.5 0.1 Z" />
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
+                                />
 
-                                        <div className="absolute inset-0 bg-gradient-to-b from-[#0A1210] to-[#040807]">
-                                            <div className="absolute inset-0 bg-[linear-gradient(rgba(42,245,152,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(42,245,152,0.1)_1px,transparent_1px)] bg-[size:16px_16px] opacity-40" />
+                                {/* Nose / Door Knob (3D look) */}
+                                <circle cx="60" cy="85" r="30" fill="url(#knob-grad)" stroke="#111718" strokeWidth="2" />
+                                <ellipse cx="50" cy="75" rx="10" ry="8" fill="rgba(255,255,255,0.15)" transform="rotate(-30 50 75)" />
 
-                                            {/* Parallax Rain Layers */}
-                                            <motion.div
-                                                className="absolute w-full top-0 font-mono text-[9px] leading-[1.3] tracking-widest text-[#1ea367] break-all p-2 text-justify select-none opacity-60"
-                                                animate={{ y: [0, -1000] }}
-                                                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                                            >
-                                                {'011010000110010101101100011011000110111110010101011010010110111001110100'.repeat(150)}
-                                            </motion.div>
+                                {/* Screws */}
+                                <circle cx="35" cy="140" r="4" fill="#111718" stroke="#2AF598" strokeWidth="1" />
+                                <line x1="32" y1="140" x2="38" y2="140" stroke="#2AF598" strokeWidth="1" transform="rotate(45 35 140)" />
 
-                                            <motion.div
-                                                className="absolute w-full top-0 font-mono text-[13px] leading-[1.1] text-brand-neon break-all p-2 text-center select-none drop-shadow-[0_0_5px_rgba(42,245,152,0.8)]"
-                                                animate={{ y: [0, -1000] }}
-                                                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                                            >
-                                                {'01 10 11 00 '.repeat(100)}
-                                            </motion.div>
+                                <circle cx="85" cy="140" r="4" fill="#111718" stroke="#2AF598" strokeWidth="1" />
+                                <line x1="82" y1="140" x2="88" y2="140" stroke="#2AF598" strokeWidth="1" transform="rotate(-30 85 140)" />
 
-                                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.9)_100%)] pointer-events-none" />
-                                        </div>
-                                    </div>
-
-                                    {/* Outline Stroke Overlay using same clip logic or matching SVG box */}
-                                    <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_12px_rgba(42,245,152,0.5)] z-20" viewBox="0 0 1 1" preserveAspectRatio="none">
-                                        <path
-                                            d="M 0.5 0.1 A 0.25 0.25 0 1 1 0.3 0.25 C 0.3 0.5, 0.2 0.8, 0.1 0.9 L 0.9 0.9 C 0.8 0.8, 0.7 0.5, 0.7 0.25 A 0.25 0.25 0 1 1 0.5 0.1 Z"
-                                            fill="none"
-                                            stroke="url(#glitch-gradient-outer)"
-                                            strokeWidth="0.015"
-                                            vectorEffect="non-scaling-stroke"
-                                        />
-                                        <defs>
-                                            <linearGradient id="glitch-gradient-outer" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#2AF598" />
-                                                <stop offset="50%" stopColor="rgba(42,245,152,0.2)" />
-                                                <stop offset="100%" stopColor="#2AF598" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-
-                                    {/* Secondary inner glow line for 3D bevel effect */}
-                                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-60 mix-blend-screen" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ transform: 'scale(0.95)' }}>
-                                        <path
-                                            d="M 50 10 C 70 10, 75 30, 70 45 C 67 51, 60 54, 58 56 C 75 60, 85 80, 90 100 L 10 100 C 15 80, 25 60, 42 56 C 40 54, 33 51, 30 45 C 25 30, 30 10, 50 10 Z"
-                                            fill="none"
-                                            stroke="#2AF598"
-                                            strokeWidth="0.5"
-                                            vectorEffect="non-scaling-stroke"
-                                        />
-                                    </svg>
-                                </motion.div>
-                            </div>
-                        </motion.div>
+                                <defs>
+                                    <linearGradient id="brass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor="#2AF598" />
+                                        <stop offset="50%" stopColor="#0B1011" />
+                                        <stop offset="100%" stopColor="#2AF598" />
+                                    </linearGradient>
+                                    <radialGradient id="knob-grad" cx="40%" cy="30%" r="60%">
+                                        <stop offset="0%" stopColor="#2AF598" />
+                                        <stop offset="70%" stopColor="#0B1011" />
+                                        <stop offset="100%" stopColor="#050505" />
+                                    </radialGradient>
+                                </defs>
+                            </motion.svg>
+                        </div>
 
                         {/* Text */}
                         <motion.p
