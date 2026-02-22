@@ -12,6 +12,7 @@ import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 
 // Pages
+import IntroScreen from './components/IntroScreen';
 import TermosDeUso from './pages/TermosDeUso';
 import PoliticaDePrivacidade from './pages/PoliticaDePrivacidade';
 import PoliticaDeCookies from './pages/PoliticaDeCookies';
@@ -20,6 +21,7 @@ import Contato from './pages/Contato';
 
 function App() {
   const [currentHash, setCurrentHash] = useState(window.location.hash);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     // Initialize dataLayer
@@ -45,6 +47,11 @@ function App() {
   if (currentHash === '#cookies') return <PoliticaDeCookies />;
   if (currentHash === '#reembolsos') return <Reembolsos />;
   if (currentHash === '#contato') return <Contato />;
+
+  // Display Intro Animation only on root and if not dismissed
+  if (!currentHash && showIntro) {
+    return <IntroScreen onComplete={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-brand-dark text-brand-text selection:bg-brand-neon/30 selection:text-white relative">
