@@ -28,61 +28,72 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
         }
 
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020000);
+        scene.fog = new THREE.FogExp2(0x020000, 0.002);
 
-        // Orthographic camera for full screen quad
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 0, 300);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        const uniforms = {
-            iTime: { value: 0 },
-            iResolution: { value: new THREE.Vector3(1, 1, 1) },
-        };
-
-        const vertexShader = `
-        varying vec2 vUv;
-        void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-        `;
-
-        const fragmentShader = `
-        precision highp float;
-
-        uniform float iTime;
-        uniform vec3 iResolution;
-        varying vec2 vUv;
-
-        void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-            vec2 uv = fragCoord / iResolution.xy;
-            float d = length(uv - 0.5) * 2.0;
-            float t = d * d * 25.0 - iTime * 3.0;
-            d = (cos(t) * 0.5 + 0.5) * (1.0 - d);
-            vec3 col = 0.5 + 0.5 * cos(t / 20.0 + uv.xyx + vec3(0.0,2.0,4.0));
-            fragColor = vec4(col, d);
-        }
-
-        void main() {
-            vec2 fragCoord = vUv * iResolution.xy;
-            vec4 color;
-            mainImage(color, fragCoord);
-            gl_FragColor = color;
-        }
-        `;
-
-        const material = new THREE.ShaderMaterial({
-            uniforms,
-            vertexShader,
-            fragmentShader,
+        // Core twisted shape
+        const knotGeo = new THREE.TorusKnotGeometry(80, 25, 200, 32, 3, 4);
+        const knotMat = new THREE.MeshStandardMaterial({
+            color: 0xaa0000,
+            emissive: 0x330000,
+            wireframe: true,
             transparent: true,
+            opacity: 0.8
         });
+        const knotMesh = new THREE.Mesh(knotGeo, knotMat);
+        scene.add(knotMesh);
 
-        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-        scene.add(mesh);
+        // Inner solid core
+        const coreGeo = new THREE.IcosahedronGeometry(60, 2);
+        const coreMat = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: 0xff0000,
+            emissiveIntensity: 0.1
+        });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        knotMesh.add(coreMesh);
+
+        // Ash Particles
+        const particleCount = 2500;
+        const particlesGeo = new THREE.BufferGeometry();
+        const posArray = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 800;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMat = new THREE.PointsMaterial({
+            size: 2,
+            color: 0x888888,
+            transparent: true,
+            opacity: 0.6,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+        const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particlesMesh);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0x110000);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xff0000, 20, 500);
+        pointLight.position.set(0, 0, 0);
+        scene.add(pointLight);
+
+        const glitchLight = new THREE.PointLight(0xffffff, 0, 1000);
+        scene.add(glitchLight);
 
         let isAnimating = true;
         const clock = new THREE.Clock();
@@ -91,7 +102,41 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             if (!isAnimating) return;
             requestAnimationFrame(animate);
 
-            uniforms.iTime.value += clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            // Rotate core
+            knotMesh.rotation.x = time * 0.1;
+            knotMesh.rotation.y = time * 0.15;
+            coreMesh.rotation.x = -time * 0.2;
+            coreMesh.rotation.z = time * 0.1;
+
+            // Pulsing heartbeat effect
+            const pulse = Math.sin(time * 5) * 0.5 + 0.5;
+            coreMat.emissiveIntensity = 0.1 + pulse * 0.6;
+            pointLight.intensity = 10 + pulse * 20;
+
+            // Creepy camera drift
+            camera.position.x = Math.sin(time * 0.2) * 20;
+            camera.position.y = Math.cos(time * 0.3) * 20;
+            camera.lookAt(0, 0, 0);
+
+            // Particles drifting up like ash
+            const positions = particlesGeo.attributes.position.array;
+            for (let i = 1; i < particleCount * 3; i += 3) {
+                positions[i] += 0.5;
+                if (positions[i] > 400) {
+                    positions[i] = -400;
+                }
+            }
+            particlesGeo.attributes.position.needsUpdate = true;
+
+            // Random lightning / glitch flashes
+            if (Math.random() > 0.98) {
+                glitchLight.intensity = 50 + Math.random() * 100;
+                glitchLight.position.set((Math.random() - 0.5) * 300, (Math.random() - 0.5) * 300, 100);
+            } else {
+                glitchLight.intensity *= 0.8; // fade out fast
+            }
 
             renderer.render(scene, camera);
         }
@@ -99,11 +144,11 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
         animate();
 
         const handleResize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
         };
         window.addEventListener('resize', handleResize);
-        handleResize(); // Initial call
 
         return () => {
             isAnimating = false;
