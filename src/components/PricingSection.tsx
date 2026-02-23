@@ -586,9 +586,9 @@ const PricingSection: React.FC = () => {
                                             <div className="relative z-10 flex flex-col items-center">
                                                 <h4 className="text-lg sm:text-xl font-heading font-bold text-brand-text mb-3 tracking-tight uppercase">A Falha</h4>
                                                 <div className="flex justify-center items-baseline gap-2 mb-3">
-                                                    <span className="text-brand-neon text-xl sm:text-2xl font-mono">12x</span>
+                                                    <span className="text-brand-neon text-xl sm:text-2xl font-mono">10x</span>
                                                     <span className="text-brand-neon text-xl sm:text-2xl font-mono">R$</span>
-                                                    <span className="text-5xl sm:text-6xl font-heading font-black text-brand-text tracking-tighter">49,70</span>
+                                                    <span className="text-5xl sm:text-6xl font-heading font-black text-brand-text tracking-tighter">58,83</span>
                                                 </div>
                                                 <p className="text-brand-muted text-[10px] sm:text-xs font-mono uppercase tracking-widest bg-brand-surface2 px-3 py-1 rounded-sm">Ou R$ 497 à vista</p>
                                             </div>
