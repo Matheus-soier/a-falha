@@ -69,7 +69,7 @@ const HeroSection: React.FC = () => {
                     transition={{ type: "spring", stiffness: 150, damping: 25 }}
                     className="inline-flex items-center gap-2 px-5 py-2 rounded-sm bg-brand-surface1 border border-brand-surface2 text-brand-neon text-xs sm:text-sm font-mono tracking-widest uppercase shadow-sm"
                 >
-                    <img src="/logo-a-falha.png" alt="A Falha Logo" className="w-5 h-5 object-contain" />
+                    <img src="/logo-a-falha.png" alt="A Falha Logo" className="w-10 h-10 object-contain" />
                     <span>A Falha</span>
                 </motion.div>
 

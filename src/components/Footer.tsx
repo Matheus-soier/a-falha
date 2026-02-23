@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-brand-surface2/50 pb-8">
                     <div className="flex items-center gap-3">
-                        <img src="/logo-a-falha.png" alt="A Falha Logo" className="w-5 h-5 object-contain opacity-80" />
+                        <img src="/logo-a-falha.png" alt="A Falha Logo" className="w-12 h-12 object-contain" />
                         <p className="font-semibold text-brand-text">&copy; 2026 <strong className="text-brand-neon font-normal">A Falha</strong> — Matheus Sampaio Soier Ltda. Todos os direitos reservados.</p>
                     </div>
 

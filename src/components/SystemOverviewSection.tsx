@@ -40,8 +40,9 @@ const SystemOverviewSection: React.FC = () => {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                        className="inline-block border border-brand-neon/30 bg-[#0B1411] px-4 py-1.5 mb-6 text-brand-neon font-mono text-xs tracking-widest uppercase rounded-sm font-semibold shadow-[0_0_10px_rgba(42,245,152,0.1)]">
-                        &gt;_ A Jornada
+                        className="inline-flex items-center gap-2 border border-brand-neon/30 bg-[#0B1411] px-4 py-1.5 mb-6 text-brand-neon font-mono text-xs tracking-widest uppercase rounded-sm font-semibold shadow-[0_0_10px_rgba(42,245,152,0.1)]">
+                        <img src="/logo-a-falha.png" alt="Logo" className="w-4 h-4 object-contain" />
+                        A Jornada
                     </motion.div>
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}

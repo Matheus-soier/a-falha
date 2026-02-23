@@ -15,7 +15,8 @@ const SocialProofSection: React.FC = () => {
                     transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
                     className="inline-flex items-center justify-center gap-2 mb-6 px-3 py-1 rounded-sm bg-brand-surface1 border border-brand-neon/30 text-brand-neon text-xs font-mono font-semibold tracking-widest uppercase shadow-[0_0_10px_rgba(42,245,152,0.1)]"
                 >
-                    &gt;_ Validação em Produção
+                    <img src="/logo-a-falha.png" alt="Logo" className="w-4 h-4 object-contain" />
+                    Validação em Produção
                 </motion.div>
                 <motion.h2
                     initial={{ opacity: 0, y: 30 }}
