@@ -24,6 +24,7 @@ import AccessGranted from './pages/AccessGranted';
 
 function App() {
   const [currentHash, setCurrentHash] = useState(window.location.hash);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [isLoading, setIsLoading] = useState(true);
   const [showIntro, setShowIntro] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
@@ -38,12 +39,17 @@ function App() {
       page_title: 'A Falha Kernel',
     });
 
-    const handleHashChange = () => {
+    const handleRouteChange = () => {
       setCurrentHash(window.location.hash);
+      setCurrentPath(window.location.pathname);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleRouteChange);
+    window.addEventListener('popstate', handleRouteChange);
+    return () => {
+      window.removeEventListener('hashchange', handleRouteChange);
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -84,13 +90,13 @@ function App() {
     }
   };
 
-  // Simple Hash Router Config
-  if (currentHash === '#termos') return <TermosDeUso />;
-  if (currentHash === '#privacidade') return <PoliticaDePrivacidade />;
-  if (currentHash === '#cookies') return <PoliticaDeCookies />;
-  if (currentHash === '#reembolsos') return <Reembolsos />;
-  if (currentHash === '#contato') return <Contato />;
-  if (currentHash === '#access-granted') return <AccessGranted />;
+  // Simple Router Config (Hash + Path support)
+  if (currentHash === '#termos' || currentPath === '/termos') return <TermosDeUso />;
+  if (currentHash === '#privacidade' || currentPath === '/privacidade') return <PoliticaDePrivacidade />;
+  if (currentHash === '#cookies' || currentPath === '/cookies') return <PoliticaDeCookies />;
+  if (currentHash === '#reembolsos' || currentPath === '/reembolsos') return <Reembolsos />;
+  if (currentHash === '#contato' || currentPath === '/contato') return <Contato />;
+  if (currentHash === '#access-granted' || currentPath === '/access-granted') return <AccessGranted />;
 
   return (
     <>
