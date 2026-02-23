@@ -187,7 +187,7 @@ const PricingSection: React.FC = () => {
     };
 
     const handleCheckout = () => {
-        window.location.href = '#checkout-url';
+        window.location.href = 'https://pay.hub.la/hOZpoE0z8RC4cC2CXNUZ';
     };
 
     const getSegmentMessage = () => {
