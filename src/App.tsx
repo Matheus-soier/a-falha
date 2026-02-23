@@ -72,6 +72,17 @@ function App() {
     }
   };
 
+  const handleStart = () => {
+    setIsLoading(false);
+    // Directly play audio here to use the user gesture from the button click
+    const audio = document.getElementById('bg-music') as HTMLAudioElement;
+    if (audio && !isMuted) {
+      audio.volume = 0.5;
+      audio.play().catch((err) => console.warn("Audio play failed:", err));
+      setHasStartedAudio(true);
+    }
+  };
+
   // Simple Hash Router Config
   if (currentHash === '#termos') return <TermosDeUso />;
   if (currentHash === '#privacidade') return <PoliticaDePrivacidade />;
@@ -79,39 +90,38 @@ function App() {
   if (currentHash === '#reembolsos') return <Reembolsos />;
   if (currentHash === '#contato') return <Contato />;
 
-  // 1. Loading Phase
-  if (isLoading) {
-    return <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />;
-  }
-
-  // 2. Intro Animation Phase (only on root)
-  if (!currentHash && showIntro) {
-    return <IntroScreen onComplete={() => setShowIntro(false)} />;
-  }
-
-  // 3. Main Landing Page
   return (
-    <div className="min-h-screen bg-brand-dark text-brand-text selection:bg-brand-neon/30 selection:text-white relative">
+    <>
       <audio id="bg-music" src="/trilha.mp3" loop />
 
-      <AudioController
-        isMuted={isMuted}
-        onToggle={toggleAudio}
-        isVisible={!isLoading}
-      />
+      {!isLoading && (
+        <AudioController
+          isMuted={isMuted}
+          onToggle={toggleAudio}
+          isVisible={true}
+        />
+      )}
 
-      <HeroSection />
-      <StacksWaveSection />
-      <ProblemSection />
-      <TargetAudienceSection />
-      <SystemOverviewSection />
-      <DeliverablesSection />
-      <SocialProofSection />
-      <PricingSection />
-      <FAQSection />
-      <Footer />
-      <Analytics />
-    </div>
+      {isLoading ? (
+        <LoadingScreen onLoadingComplete={handleStart} />
+      ) : (!currentHash && showIntro) ? (
+        <IntroScreen onComplete={() => setShowIntro(false)} />
+      ) : (
+        <div className="min-h-screen bg-brand-dark text-brand-text selection:bg-brand-neon/30 selection:text-white relative">
+          <HeroSection />
+          <StacksWaveSection />
+          <ProblemSection />
+          <TargetAudienceSection />
+          <SystemOverviewSection />
+          <DeliverablesSection />
+          <SocialProofSection />
+          <PricingSection />
+          <FAQSection />
+          <Footer />
+          <Analytics />
+        </div>
+      )}
+    </>
   );
 }
 
