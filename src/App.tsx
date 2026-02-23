@@ -13,6 +13,8 @@ import Footer from './components/Footer';
 
 // Pages
 import IntroScreen from './components/IntroScreen';
+import LoadingScreen from './components/LoadingScreen';
+import AudioController from './components/AudioController';
 import TermosDeUso from './pages/TermosDeUso';
 import PoliticaDePrivacidade from './pages/PoliticaDePrivacidade';
 import PoliticaDeCookies from './pages/PoliticaDeCookies';
@@ -21,7 +23,9 @@ import Contato from './pages/Contato';
 
 function App() {
   const [currentHash, setCurrentHash] = useState(window.location.hash);
+  const [isLoading, setIsLoading] = useState(true);
   const [showIntro, setShowIntro] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [hasStartedAudio, setHasStartedAudio] = useState(false);
 
   useEffect(() => {
@@ -35,7 +39,6 @@ function App() {
 
     const handleHashChange = () => {
       setCurrentHash(window.location.hash);
-      // Optional: push to dataLayer for legal routes if needed here.
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -43,18 +46,31 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Attempt to play audio when user leaves the intro screen
-    if (!showIntro && !hasStartedAudio) {
-      const audio = document.getElementById('bg-music') as HTMLAudioElement;
-      if (audio) {
-        audio.volume = 0.5; // Set volume to 50%
+    // Attempt to play audio when user leaves the loading screen
+    const audio = document.getElementById('bg-music') as HTMLAudioElement;
+    if (audio) {
+      if (!isLoading && !hasStartedAudio && !isMuted) {
+        audio.volume = 0.5;
         audio.play().catch((err) => {
           console.warn("Autoplay blocked or audio missing: ", err);
         });
         setHasStartedAudio(true);
       }
+
+      // Sync mute state
+      audio.muted = isMuted;
     }
-  }, [showIntro, hasStartedAudio]);
+  }, [isLoading, hasStartedAudio, isMuted]);
+
+  const toggleAudio = () => {
+    const audio = document.getElementById('bg-music') as HTMLAudioElement;
+    if (audio) {
+      if (isMuted) {
+        audio.play().catch(() => { });
+      }
+      setIsMuted(!isMuted);
+    }
+  };
 
   // Simple Hash Router Config
   if (currentHash === '#termos') return <TermosDeUso />;
@@ -63,14 +79,27 @@ function App() {
   if (currentHash === '#reembolsos') return <Reembolsos />;
   if (currentHash === '#contato') return <Contato />;
 
-  // Display Intro Animation only on root and if not dismissed
+  // 1. Loading Phase
+  if (isLoading) {
+    return <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />;
+  }
+
+  // 2. Intro Animation Phase (only on root)
   if (!currentHash && showIntro) {
     return <IntroScreen onComplete={() => setShowIntro(false)} />;
   }
 
+  // 3. Main Landing Page
   return (
     <div className="min-h-screen bg-brand-dark text-brand-text selection:bg-brand-neon/30 selection:text-white relative">
       <audio id="bg-music" src="/trilha.mp3" loop />
+
+      <AudioController
+        isMuted={isMuted}
+        onToggle={toggleAudio}
+        isVisible={!isLoading}
+      />
+
       <HeroSection />
       <StacksWaveSection />
       <ProblemSection />
