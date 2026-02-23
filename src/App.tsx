@@ -20,6 +20,7 @@ import PoliticaDePrivacidade from './pages/PoliticaDePrivacidade';
 import PoliticaDeCookies from './pages/PoliticaDeCookies';
 import Reembolsos from './pages/Reembolsos';
 import Contato from './pages/Contato';
+import AccessGranted from './pages/AccessGranted';
 
 function App() {
   const [currentHash, setCurrentHash] = useState(window.location.hash);
@@ -89,6 +90,7 @@ function App() {
   if (currentHash === '#cookies') return <PoliticaDeCookies />;
   if (currentHash === '#reembolsos') return <Reembolsos />;
   if (currentHash === '#contato') return <Contato />;
+  if (currentHash === '#access-granted') return <AccessGranted />;
 
   return (
     <>
